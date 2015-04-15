@@ -11,7 +11,12 @@ SbbmTargetMachine::SbbmTargetMachine(
   const TargetOptions &Options, Reloc::Model RM, CodeModel::Model CM,
   CodeGenOpt::Level OL)
   : LLVMTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL)
+  , Subtarget(TT, CPU, FS)
 { }
+
+const TargetSubtargetInfo *SbbmTargetMachine::getSubtargetImpl() const {
+  return &Subtarget;
+}
 
 extern "C" void LLVMInitializeSbbmTarget() {
   RegisterTargetMachine<SbbmTargetMachine> X(TheSbbmTarget);
