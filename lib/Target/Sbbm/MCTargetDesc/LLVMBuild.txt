@@ -1,0 +1,10 @@
+; FIXME: Add standard header.
+
+[component_0]
+type = Library
+name = SbbmDesc
+parent = Sbbm
+required_libraries = MC Support SbbmInfo
+add_to_library_groups = Sbbm
+
+; -*- Conf -*-

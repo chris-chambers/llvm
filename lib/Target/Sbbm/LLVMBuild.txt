@@ -1,0 +1,18 @@
+; FIXME: Add standard header.
+
+[common]
+subdirectories = TargetInfo MCTargetDesc
+
+[component_0]
+type = TargetGroup
+name = Sbbm
+parent = Target
+
+[component_1]
+type = Library
+name = SbbmCodeGen
+parent = Sbbm
+required_libraries = CodeGen Core SbbmInfo
+add_to_library_groups = Sbbm
+
+; -*- Conf -*-
