@@ -12,7 +12,7 @@ parent = Target
 type = Library
 name = SbbmCodeGen
 parent = Sbbm
-required_libraries = CodeGen Core SelectionDAG Target SbbmInfo
+required_libraries = AsmPrinter CodeGen Core SelectionDAG Target SbbmInfo
 add_to_library_groups = Sbbm
 
 ; -*- Conf -*-

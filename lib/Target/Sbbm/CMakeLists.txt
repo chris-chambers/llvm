@@ -8,6 +8,7 @@ tablegen(LLVM SbbmGenSubtargetInfo.inc -gen-subtarget)
 add_public_tablegen_target(SbbmCommonTableGen)
 
 add_llvm_target(SbbmCodeGen
+  SbbmAsmPrinter.cpp
   SbbmInstrInfo.cpp
   SbbmRegisterInfo.cpp
   SbbmSubtarget.cpp
