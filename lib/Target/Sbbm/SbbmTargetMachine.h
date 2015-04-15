@@ -15,7 +15,9 @@ public:
     const TargetOptions &Options, Reloc::Model RM, CodeModel::Model CM,
     CodeGenOpt::Level OL);
 
-  virtual const TargetSubtargetInfo *getSubtargetImpl() const;
+  virtual const TargetSubtargetInfo *getSubtargetImpl() const override;
+
+  virtual TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 
 private:
   SbbmSubtarget Subtarget;

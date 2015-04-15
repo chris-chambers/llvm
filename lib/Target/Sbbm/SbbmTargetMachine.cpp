@@ -2,6 +2,7 @@
 
 #include "SbbmTargetMachine.h"
 #include "TargetInfo/SbbmTargetInfo.h"
+#include "llvm/CodeGen/Passes.h"
 #include "llvm/Support/TargetRegistry.h"
 
 using namespace llvm;
@@ -19,6 +20,22 @@ SbbmTargetMachine::SbbmTargetMachine(
 const TargetSubtargetInfo *SbbmTargetMachine::getSubtargetImpl() const {
   return &Subtarget;
 }
+
+TargetPassConfig *SbbmTargetMachine::createPassConfig(PassManagerBase &PM) {
+  class SbbmPassConfig : public TargetPassConfig {
+  public:
+    SbbmPassConfig(SbbmTargetMachine *TM, PassManagerBase &PM)
+      : TargetPassConfig(TM, PM)
+    { }
+
+    virtual bool addPreISel() override { return false; }
+    virtual bool addInstSelector() override { return false; }
+    virtual void addPreEmitPass() override { }
+  };
+
+  return new SbbmPassConfig(this, PM);
+}
+
 
 extern "C" void LLVMInitializeSbbmTarget() {
   RegisterTargetMachine<SbbmTargetMachine> X(TheSbbmTarget);
