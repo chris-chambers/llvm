@@ -12,7 +12,9 @@ SbbmTargetMachine::SbbmTargetMachine(
   CodeGenOpt::Level OL)
   : LLVMTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL)
   , Subtarget(TT, CPU, FS)
-{ }
+{
+  initAsmInfo();
+}
 
 const TargetSubtargetInfo *SbbmTargetMachine::getSubtargetImpl() const {
   return &Subtarget;

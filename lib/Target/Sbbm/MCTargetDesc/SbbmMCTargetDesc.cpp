@@ -1,6 +1,7 @@
 // FIXME: Add standard header.
 
 #include "SbbmMCTargetDesc.h"
+#include "SbbmMCAsmInfo.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
@@ -18,6 +19,10 @@
 using namespace llvm;
 
 namespace {
+
+static MCAsmInfo *createMCAsmInfo(const MCRegisterInfo &MRI, StringRef TT) {
+  return new SbbmMCAsmInfo(TT);
+}
 
 static MCInstrInfo *createMCInstrInfo() {
   MCInstrInfo *InstrInfo = new MCInstrInfo();
@@ -42,6 +47,7 @@ static MCSubtargetInfo *createMCSubtargetInfo(
 } // anonymous namespace
 
 extern "C" void LLVMInitializeSbbmTargetMC() {
+  TargetRegistry::RegisterMCAsmInfo(TheSbbmTarget, createMCAsmInfo);
   TargetRegistry::RegisterMCInstrInfo(TheSbbmTarget, createMCInstrInfo);
   TargetRegistry::RegisterMCRegInfo(TheSbbmTarget, createMCRegInfo);
   TargetRegistry::RegisterMCSubtargetInfo(TheSbbmTarget, createMCSubtargetInfo);
