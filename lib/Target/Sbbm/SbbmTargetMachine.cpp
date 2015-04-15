@@ -3,6 +3,7 @@
 #include "SbbmTargetMachine.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/CodeGen/Passes.h"
+#include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "llvm/Support/TargetRegistry.h"
 
 using namespace llvm;
@@ -15,6 +16,12 @@ SbbmTargetMachine::SbbmTargetMachine(
   , Subtarget(TT, CPU, FS, *this)
 {
   initAsmInfo();
+}
+
+TargetLoweringObjectFile* SbbmTargetMachine::getObjFileLowering() const {
+  // FIXME: We don't really want ELF format.  We want a very bare format.
+  static TargetLoweringObjectFileELF tlof;
+  return &tlof;
 }
 
 const TargetSubtargetInfo *SbbmTargetMachine::getSubtargetImpl() const {
