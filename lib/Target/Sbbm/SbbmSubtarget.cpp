@@ -12,8 +12,10 @@
 using namespace llvm;
 
 SbbmSubtarget::SbbmSubtarget(
-  const std::string &TT, const std::string &CPU, const std::string &FS)
+  const std::string &TT, const std::string &CPU, const std::string &FS,
+  const SbbmTargetMachine &TM)
   : SbbmGenSubtargetInfo(TT, CPU, FS)
+  , TargetLowering(TM)
 { }
 
 const DataLayout *SbbmSubtarget::getDataLayout() const {

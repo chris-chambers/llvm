@@ -11,6 +11,7 @@ add_llvm_target(SbbmCodeGen
   SbbmInstrInfo.cpp
   SbbmRegisterInfo.cpp
   SbbmSubtarget.cpp
+  SbbmTargetLowering.cpp
   SbbmTargetMachine.cpp
   )
 
