@@ -9,6 +9,7 @@ add_public_tablegen_target(SbbmCommonTableGen)
 
 add_llvm_target(SbbmCodeGen
   SbbmAsmPrinter.cpp
+  SbbmFrameLowering.cpp
   SbbmInstrInfo.cpp
   SbbmRegisterInfo.cpp
   SbbmSubtarget.cpp

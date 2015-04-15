@@ -23,6 +23,7 @@ public:
     const SbbmTargetMachine &TM);
 
   virtual const DataLayout *getDataLayout() const override;
+  virtual const TargetFrameLowering *getFrameLowering() const override;
   virtual const SbbmInstrInfo *getInstrInfo() const override;
   virtual const SbbmRegisterInfo *getRegisterInfo() const override;
   virtual const SbbmTargetLowering *getTargetLowering() const override {

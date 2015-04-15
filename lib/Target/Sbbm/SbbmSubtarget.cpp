@@ -1,6 +1,7 @@
 // FIXME: Add standard header.
 
 #include "SbbmSubtarget.h"
+#include "SbbmFrameLowering.h"
 #include "llvm/IR/DataLayout.h"
 
 #define DEBUG_TYPE "sbbm-subtarget"
@@ -32,6 +33,12 @@ const DataLayout *SbbmSubtarget::getDataLayout() const {
     "n32");
 
   return &DL;
+}
+
+const TargetFrameLowering *SbbmSubtarget::getFrameLowering() const {
+  static const SbbmFrameLowering FrameLowering;
+
+  return &FrameLowering;
 }
 
 const SbbmInstrInfo *SbbmSubtarget::getInstrInfo() const {
