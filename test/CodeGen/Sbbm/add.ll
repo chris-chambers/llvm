@@ -25,3 +25,11 @@ define i32 @test3(i32 %a) {
   %x = add i32 15, %a
   ret i32 %x
 }
+
+; add imm-imm constant folding works
+define i32 @test4() {
+; CHECK-LABEL: test4:
+; CHECK: mov r0, #3
+  %x = add i32 1, 2
+  ret i32 %x
+}
