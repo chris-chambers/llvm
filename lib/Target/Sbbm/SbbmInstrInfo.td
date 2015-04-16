@@ -38,6 +38,11 @@ def : Pat<(add GRRegs:$lhs, i32negimm:$rhs),
 def : Pat<(sub GRRegs:$lhs, i32negimm:$rhs),
           (ADDri $lhs, (negate $rhs))>;
 
+def MOVrr : SbbmInstr<
+    (outs GRRegs:$dst),
+    (ins GRRegs:$src),
+    "mov $dst, $src">;
+
 def MOVri : SbbmInstr<
     (outs GRRegs:$dst),
     (ins i32imm:$imm),

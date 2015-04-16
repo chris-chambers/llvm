@@ -26,15 +26,15 @@ define i32 @test3() {
   ret i32 %x
 }
 
-;; sub reg-imm is not commutable
-;define i32 @test4(i32 %a) {
-;; XXCHECK-LABEL: test4:
-;; XXCHECK:      mov r1, #15
-;; XXCHECK-NEXT: sub r1, r0
-;; XXCHECK-NEXT: mov r0, r1
-;  %x = sub i32 15, %a
-;  ret i32 %x
-;}
+; sub is not commutable
+define i32 @test4(i32 %a) {
+; CHECK-LABEL: test4:
+; CHECK:      mov r1, #15
+; CHECK-NEXT: sub r1, r0
+; CHECK-NEXT: mov r0, r1
+  %x = sub i32 15, %a
+  ret i32 %x
+}
 
 ; sub reg-imm with negative constant is converted to add reg-imm
 define i32 @test5(i32 %a) {

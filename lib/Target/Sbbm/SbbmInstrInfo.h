@@ -20,6 +20,10 @@ public:
   /// always be able to get register info as well (through this method).
   const SbbmRegisterInfo &getRegisterInfo() const { return RI; }
 
+  virtual void copyPhysReg(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator I, DebugLoc DL,
+    unsigned DestReg, unsigned SrcReg, bool KillSrc) const override;
+
 private:
   virtual void anchor();
 
