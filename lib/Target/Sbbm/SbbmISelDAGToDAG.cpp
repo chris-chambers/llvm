@@ -20,6 +20,11 @@ public:
   }
 
   virtual SDNode *Select(SDNode *N) override {
+    if (N->isMachineOpcode()) {
+      // Sometimes lowering produces ready-to-go machine opcodes.  If so, use
+      // them directly.
+      return N;
+    }
     return SelectCode(N);
   }
 
