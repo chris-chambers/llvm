@@ -18,7 +18,16 @@ SbbmRegisterInfo::SbbmRegisterInfo()
 const uint16_t *
 SbbmRegisterInfo::getCalleeSavedRegs(const MachineFunction *MF) const
 {
-  llvm_unreachable("getCalleeSavedRegs not implemented");
+  static const MCPhysReg EmptySaveList[] = { 0 };
+
+  if (MF->getFunction()->hasFnAttribute(llvm::Attribute::NoReturn)) {
+      return EmptySaveList;
+  }
+  return CC_Save_SaveList;
+}
+
+const uint32_t *SbbmRegisterInfo::getCallPreservedMask(CallingConv::ID) const {
+  return CC_Save_RegMask;
 }
 
 unsigned SbbmRegisterInfo::getFrameRegister(const MachineFunction &MF) const {

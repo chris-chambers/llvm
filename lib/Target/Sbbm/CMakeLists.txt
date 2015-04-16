@@ -2,6 +2,7 @@
 
 set(LLVM_TARGET_DEFINITIONS Sbbm.td)
 
+tablegen(LLVM SbbmGenCallingConv.inc -gen-callingconv)
 tablegen(LLVM SbbmGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM SbbmGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM SbbmGenInstrInfo.inc -gen-instr-info)

@@ -2,9 +2,10 @@
 
 include "llvm/Target/Target.td"
 
-// Register and instruction descriptions
+// Register, instruction, and calling convention descriptions
 include "SbbmRegisterInfo.td"
 include "SbbmInstrInfo.td"
+include "SbbmCallingConv.td"
 
 def SbbmInstrInfo : InstrInfo;
 

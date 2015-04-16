@@ -14,14 +14,16 @@ struct SbbmRegisterInfo : public SbbmGenRegisterInfo {
 public:
   SbbmRegisterInfo();
 
-  const uint16_t *getCalleeSavedRegs(const MachineFunction *MF = nullptr)
+  virtual const uint16_t *getCalleeSavedRegs(const MachineFunction *MF = nullptr)
     const override;
 
-  unsigned getFrameRegister(const MachineFunction &MF) const;
+  virtual const uint32_t *getCallPreservedMask(CallingConv::ID) const override;
 
-  BitVector getReservedRegs(const MachineFunction &MF) const override;
+  virtual unsigned getFrameRegister(const MachineFunction &MF) const override;
 
-  void eliminateFrameIndex(
+  virtual BitVector getReservedRegs(const MachineFunction &MF) const override;
+
+  virtual void eliminateFrameIndex(
     MachineBasicBlock::iterator II, int SPAdj, unsigned FIOperandNum,
     RegScavenger *RS = nullptr)
     const override;
