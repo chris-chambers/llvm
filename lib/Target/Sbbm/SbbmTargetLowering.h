@@ -8,6 +8,17 @@
 
 namespace llvm {
 
+namespace Sbbm {
+namespace ISD {
+
+enum NodeType {
+  FIRST_NUMBER = llvm::ISD::BUILTIN_OP_END,
+  HALT_FLAG,
+  RET_FLAG,
+};
+
+}} // namespace Sbbm::ISD
+
 class SbbmTargetMachine;
 
 class SbbmTargetLowering : public TargetLowering {

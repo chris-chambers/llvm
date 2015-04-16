@@ -16,3 +16,25 @@ void SbbmInstPrinter::printInst(
   printInstruction(MI, O);
   printAnnotation(O, Annot);
 }
+
+void SbbmInstPrinter::printOperand(
+  const MCInst *MI, unsigned OpNo, raw_ostream &O)
+{
+  const MCOperand &Op = MI->getOperand(OpNo);
+  if (Op.isReg()) {
+    printRegName(O, Op.getReg());
+    return;
+  }
+
+  if (Op.isImm()) {
+    O << "#" << Op.getImm();
+    return;
+  }
+
+  llvm_unreachable(
+    "printOperand: only register and immediate operands are currently supported");
+}
+
+void SbbmInstPrinter::printRegName(raw_ostream &OS, unsigned RegNo) const {
+  OS << StringRef(getRegisterName(RegNo)).lower();
+}

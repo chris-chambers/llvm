@@ -22,6 +22,11 @@ public:
 
   virtual void printInst(const MCInst *MI, raw_ostream &O, StringRef Annot)
     override;
+
+  virtual void printRegName(raw_ostream &OS, unsigned RegNo) const override;
+
+private:
+  void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &O);
 };
 
 } // namespace llvm

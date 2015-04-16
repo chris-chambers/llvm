@@ -1,6 +1,7 @@
 // FIXME: Add standard header.
 
 #include "SbbmFunctionPasses.h"
+#include "MCTargetDesc/SbbmMCTargetDesc.h"
 #include "SbbmSubtarget.h"
 #include "SbbmTargetMachine.h"
 #include "llvm/CodeGen/SelectionDAGISel.h"

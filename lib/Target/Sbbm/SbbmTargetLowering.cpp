@@ -120,8 +120,8 @@ SDValue SbbmTargetLowering::LowerReturn(
   }
 
   if (DAG.getMachineFunction().getFunction()->hasFnAttribute(llvm::Attribute::NoReturn)) {
-    return SDValue(DAG.getMachineNode(Sbbm::HALT, DL, MVT::Other, RetOps), 0);
+    return DAG.getNode(Sbbm::ISD::HALT_FLAG, DL, MVT::Other, RetOps);
   }
 
-  return SDValue(DAG.getMachineNode(Sbbm::BLR, DL, MVT::Other, RetOps), 0);
+  return DAG.getNode(Sbbm::ISD::RET_FLAG, DL, MVT::Other, RetOps);
 }
