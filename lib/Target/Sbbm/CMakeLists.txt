@@ -2,6 +2,7 @@
 
 set(LLVM_TARGET_DEFINITIONS Sbbm.td)
 
+tablegen(LLVM SbbmGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM SbbmGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM SbbmGenInstrInfo.inc -gen-instr-info)
 tablegen(LLVM SbbmGenSubtargetInfo.inc -gen-subtarget)
@@ -11,6 +12,7 @@ add_llvm_target(SbbmCodeGen
   SbbmAsmPrinter.cpp
   SbbmFrameLowering.cpp
   SbbmInstrInfo.cpp
+  SbbmISelDAGToDAG.cpp
   SbbmRegisterInfo.cpp
   SbbmSubtarget.cpp
   SbbmTargetLowering.cpp

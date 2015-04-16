@@ -13,7 +13,6 @@ class SbbmTargetMachine;
 class SbbmTargetLowering : public TargetLowering {
 public:
   explicit SbbmTargetLowering(const SbbmTargetMachine &TM);
-
 };
 
 } // namespace llvm
