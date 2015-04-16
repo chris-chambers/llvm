@@ -32,8 +32,42 @@ SDValue SbbmTargetLowering::LowerFormalArguments(
   const SmallVectorImpl<ISD::InputArg> &Ins, SDLoc DL, SelectionDAG &DAG,
   SmallVectorImpl<SDValue> &InVals) const
 {
-  if (!Ins.empty()) {
-    llvm_unreachable("LowerFormalArguments not implemented for more than zero arguments");
+  if (isVarArg) {
+    llvm_unreachable("LowerFormalArguments: varargs are not yet supported");
+  }
+
+  MachineFunction &MF = DAG.getMachineFunction();
+  MachineRegisterInfo &RegInfo = MF.getRegInfo();
+
+  // Assign locations to all of the incoming arguments.
+  const auto ArgLocs = [&]() {
+    SmallVector<CCValAssign, 16> ArgLocs;
+    CCState CCInfo(CallConv, isVarArg, MF, ArgLocs, *DAG.getContext());
+    CCInfo.AnalyzeFormalArguments(Ins, CC_Sbbm);
+    return ArgLocs;
+  }();
+
+  for (const auto &VA : ArgLocs) {
+    if (!VA.isRegLoc()) {
+      llvm_unreachable(
+        "LowerFormalArguments: only arguments passed in registers are currently "
+        "supported");
+    }
+
+    SDValue ArgIn;
+    EVT RegVT = VA.getLocVT();
+    switch (RegVT.getSimpleVT().SimpleTy) {
+    default:
+      llvm_unreachable("Unhandled type for register");
+    case MVT::i32: {
+      unsigned int VReg = RegInfo.createVirtualRegister(&Sbbm::GRRegsRegClass);
+      RegInfo.addLiveIn(VA.getLocReg(), VReg);
+      ArgIn = DAG.getCopyFromReg(Chain, DL, VReg, RegVT);
+      break;
+    }
+    }
+
+    InVals.push_back(ArgIn);
   }
 
   return Chain;
