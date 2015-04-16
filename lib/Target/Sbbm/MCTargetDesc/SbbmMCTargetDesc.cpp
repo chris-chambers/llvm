@@ -2,6 +2,7 @@
 
 #include "SbbmMCTargetDesc.h"
 #include "SbbmMCAsmInfo.h"
+#include "InstPrinter/SbbmInstPrinter.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/MC/MCCodeGenInfo.h"
 #include "llvm/MC/MCInstrInfo.h"
@@ -39,6 +40,13 @@ static MCInstrInfo *createMCInstrInfo() {
   return InstrInfo;
 }
 
+static MCInstPrinter *createMCInstPrinter(
+  const Target &T, unsigned SyntaxVariant, const MCAsmInfo &MAI,
+  const MCInstrInfo &MII, const MCRegisterInfo &MRI, const MCSubtargetInfo &STI)
+{
+  return new SbbmInstPrinter(MAI, MII, MRI);
+}
+
 static MCRegisterInfo *createMCRegInfo(StringRef TT) {
   MCRegisterInfo *RegisterInfo = new MCRegisterInfo();
   InitSbbmMCRegisterInfo(RegisterInfo, Sbbm::LR);
@@ -59,6 +67,7 @@ extern "C" void LLVMInitializeSbbmTargetMC() {
   TargetRegistry::RegisterMCAsmInfo(TheSbbmTarget, createMCAsmInfo);
   TargetRegistry::RegisterMCCodeGenInfo(TheSbbmTarget, createMCCodeGenInfo);
   TargetRegistry::RegisterMCInstrInfo(TheSbbmTarget, createMCInstrInfo);
+  TargetRegistry::RegisterMCInstPrinter(TheSbbmTarget, createMCInstPrinter);
   TargetRegistry::RegisterMCRegInfo(TheSbbmTarget, createMCRegInfo);
   TargetRegistry::RegisterMCSubtargetInfo(TheSbbmTarget, createMCSubtargetInfo);
 }

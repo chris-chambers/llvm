@@ -2,6 +2,7 @@
 
 set(LLVM_TARGET_DEFINITIONS Sbbm.td)
 
+tablegen(LLVM SbbmGenAsmWriter.inc -gen-asm-writer)
 tablegen(LLVM SbbmGenCallingConv.inc -gen-callingconv)
 tablegen(LLVM SbbmGenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM SbbmGenRegisterInfo.inc -gen-register-info)
@@ -20,5 +21,6 @@ add_llvm_target(SbbmCodeGen
   SbbmTargetMachine.cpp
   )
 
+add_subdirectory(InstPrinter)
 add_subdirectory(MCTargetDesc)
 add_subdirectory(TargetInfo)

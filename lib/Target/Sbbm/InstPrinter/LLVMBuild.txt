@@ -2,9 +2,9 @@
 
 [component_0]
 type = Library
-name = SbbmDesc
+name = SbbmInstPrinter
 parent = Sbbm
-required_libraries = MC Support SbbmInfo SbbmInstPrinter
+required_libraries = MC Support
 add_to_library_groups = Sbbm
 
 ; -*- Conf -*-
