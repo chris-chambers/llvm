@@ -25,10 +25,15 @@ let isCommutable = 1 in {
 def ADDrr : SbbmBinOp<"add", add>;
 def ADDri : SbbmBinImm<"add", add>;
 
+def MULrr : SbbmBinOp<"mul", mul>;
+
 }
 
 def SUBrr : SbbmBinOp<"sub", sub>;
 def SUBri : SbbmBinImm<"sub", sub>;
+
+def SDIVrr : SbbmBinOp<"sdiv", sdiv>;
+def SREMrr : SbbmBinOp<"srem", srem>;
 
 // Convert ADDri with negative immediate to SUBri
 def : Pat<(add GRRegs:$lhs, i32negimm:$rhs),
