@@ -3,14 +3,22 @@
 include "SbbmInstrFormats.td"
 include "SbbmOperators.td"
 
+def i32posimm : ImmLeaf<i32, [{ return Imm > 0; }]>;
+
+let Constraints = "$src1 = $dst", isCommutable = 1 in {
+
 def ADDrr : SbbmInstr<
     (outs GRRegs:$dst),
     (ins GRRegs:$src1, GRRegs:$src2),
     "add $dst, $src2",
-    [(set i32:$dst, (add i32:$src1, i32:$src2))]> {
+    [(set i32:$dst, (add i32:$src1, i32:$src2))]>;
 
-    let Constraints = "$src1 = $dst";
-    let isCommutable = 1;
+def ADDri : SbbmInstr<
+    (outs GRRegs:$dst),
+    (ins GRRegs:$src1, i32imm:$src2),
+    "add $dst, $src2",
+    [(set i32:$dst, (add i32:$src1, i32posimm:$src2))]>;
+
 }
 
 let isTerminator = 1, isReturn = 1, isBarrier = 1 in {
