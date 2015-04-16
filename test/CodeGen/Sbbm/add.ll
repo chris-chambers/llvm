@@ -33,3 +33,11 @@ define i32 @test4() {
   %x = add i32 1, 2
   ret i32 %x
 }
+
+; add reg-imm with negative immediate is converted to sub reg-imm
+define i32 @test5(i32 %a) {
+; CHECK-LABEL: test5:
+; CHECK: sub r0, #99
+  %x = add i32 %a, -99
+  ret i32 %x
+}

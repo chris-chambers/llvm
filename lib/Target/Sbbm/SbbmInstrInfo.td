@@ -1,26 +1,42 @@
 // FIXME: Add standard header.
 
 include "SbbmInstrFormats.td"
+include "SbbmOperands.td"
 include "SbbmOperators.td"
+include "SbbmXForms.td"
 
-def i32simm : ImmLeaf<i32, [{}]>;
-def i32posimm : ImmLeaf<i32, [{ return Imm > 0; }]>;
+let Constraints = "$src1 = $dst" in {
 
-let Constraints = "$src1 = $dst", isCommutable = 1 in {
-
-def ADDrr : SbbmInstr<
+class SbbmBinOp<string opstr, SDNode opnode> : SbbmInstr<
     (outs GRRegs:$dst),
     (ins GRRegs:$src1, GRRegs:$src2),
-    "add $dst, $src2",
-    [(set i32:$dst, (add i32:$src1, i32:$src2))]>;
+    opstr#" $dst, $src2",
+    [(set i32:$dst, (opnode i32:$src1, i32:$src2))]>;
 
-def ADDri : SbbmInstr<
+class SbbmBinImm<string opstr, SDNode opnode> : SbbmInstr<
     (outs GRRegs:$dst),
     (ins GRRegs:$src1, i32imm:$src2),
-    "add $dst, $src2",
+    opstr#" $dst, $src2",
     [(set i32:$dst, (add i32:$src1, i32posimm:$src2))]>;
+}
+
+let isCommutable = 1 in {
+
+def ADDrr : SbbmBinOp<"add", add>;
+def ADDri : SbbmBinImm<"add", add>;
 
 }
+
+def SUBrr : SbbmBinOp<"sub", sub>;
+def SUBri : SbbmBinImm<"sub", sub>;
+
+// Convert ADDri with negative immediate to SUBri
+def : Pat<(add GRRegs:$lhs, i32negimm:$rhs),
+          (SUBri $lhs, (negate $rhs))>;
+
+// Convert SUBri with negative immediate to ADDri
+def : Pat<(sub GRRegs:$lhs, i32negimm:$rhs),
+          (ADDri $lhs, (negate $rhs))>;
 
 def MOVri : SbbmInstr<
     (outs GRRegs:$dst),
