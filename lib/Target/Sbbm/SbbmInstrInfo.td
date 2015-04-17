@@ -35,6 +35,11 @@ def SUBri : SbbmBinImm<"sub", sub>;
 def SDIVrr : SbbmBinOp<"sdiv", sdiv>;
 def SREMrr : SbbmBinOp<"srem", srem>;
 
+// Logical shift left, arithmetic shift right, logical shift right
+def LSLrr : SbbmBinOp<"lsl", shl>;
+def ASRrr : SbbmBinOp<"asr", sra>;
+def LSRrr : SbbmBinOp<"lsr", srl>;
+
 // Convert ADDri with negative immediate to SUBri
 def : Pat<(add GRRegs:$lhs, i32negimm:$rhs),
           (SUBri $lhs, (negate $rhs))>;
