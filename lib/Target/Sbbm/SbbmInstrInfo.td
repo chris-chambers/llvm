@@ -35,6 +35,11 @@ def SUBri : SbbmBinImm<"sub", sub>;
 def SDIVrr : SbbmBinOp<"sdiv", sdiv>;
 def SREMrr : SbbmBinOp<"srem", srem>;
 
+// Bitwise and, or, exclusive-or
+def ANDrr : SbbmBinOp<"and", and>;
+def ORRrr : SbbmBinOp<"orr", or>;
+def EORrr : SbbmBinOp<"eor", xor>;
+
 // Logical shift left, arithmetic shift right, logical shift right
 def LSLrr : SbbmBinOp<"lsl", shl>;
 def ASRrr : SbbmBinOp<"asr", sra>;
