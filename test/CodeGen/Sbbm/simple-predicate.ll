@@ -96,19 +96,104 @@ f:
   ret i32 2
 }
 
-; FIXME: Implement ordinary cmp instructions so reg-reg can work.
-;; branch, eq, reg-reg
-;define i32 @test7(i32 %a, i32 %b) {
-;entry7:
-;; xxxCHECK-LABEL: test7:
-;; xxxCHECK: testn r0, #10, #10, [[FLBL:.+]]
-;; xxxCHECK-NEXT: b [[TLBL:.+]]
-;; xxxCHECK-NEXT: [[TLBL]]:
-;; xxxCHECK: [[FLBL]]:
-;  %0 = icmp eq i32 %a, %b
-;  br i1 %0, label %t, label %f
-;t:
-;  ret i32 1
-;f:
-;  ret i32 2
-;}
+; branch, eq, reg-reg
+define i32 @test7(i32 %a, i32 %b) {
+entry7:
+; CHECK-LABEL: test7:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #0, #0
+; CHECK-NEXT: mov r0, #2 {p0, 0, 0}
+; CHECK-NEXT: mov r0, #1 {p0, 1, 1}
+; CHECK-NEXT: b lr
+  %0 = icmp eq i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}
+
+; branch, ne, reg-reg
+define i32 @test8(i32 %a, i32 %b) {
+entry8:
+; CHECK-LABEL: test8:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #0, #0
+; CHECK-NEXT: mov r0, #2 {p0, 1, 1}
+; CHECK-NEXT: mov r0, #1 {p0, 0, 0}
+; CHECK-NEXT: b lr
+  %0 = icmp ne i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}
+
+; branch, sge, reg-reg
+define i32 @test9(i32 %a, i32 %b) {
+entry9:
+; CHECK-LABEL: test9:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #-2147483648, #-1
+; CHECK-NEXT: mov r0, #2 {p0, 1, 1}
+; CHECK-NEXT: mov r0, #1 {p0, 0, 0}
+; CHECK-NEXT: b lr
+  %0 = icmp sge i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}
+
+; branch, sgt, reg-reg
+define i32 @test10(i32 %a, i32 %b) {
+entry10:
+; CHECK-LABEL: test10:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #-2147483648, #0
+; CHECK-NEXT: mov r0, #2 {p0, 1, 1}
+; CHECK-NEXT: mov r0, #1 {p0, 0, 0}
+; CHECK-NEXT: b lr
+  %0 = icmp sgt i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}
+
+; branch, sle, reg-reg
+define i32 @test11(i32 %a, i32 %b) {
+entry11:
+; CHECK-LABEL: test11:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #1, #2147483647
+; CHECK-NEXT: mov r0, #2 {p0, 1, 1}
+; CHECK-NEXT: mov r0, #1 {p0, 0, 0}
+; CHECK-NEXT: b lr
+  %0 = icmp sle i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}
+
+; branch, slt, reg-reg
+define i32 @test12(i32 %a, i32 %b) {
+entry12:
+; CHECK-LABEL: test12:
+; CHECK: sub r0, r1
+; CHECK-NEXT: rng p0, r0, #0, #2147483647
+; CHECK-NEXT: mov r0, #2 {p0, 1, 1}
+; CHECK-NEXT: mov r0, #1 {p0, 0, 0}
+; CHECK-NEXT: b lr
+  %0 = icmp slt i32 %a, %b
+  br i1 %0, label %t, label %f
+t:
+  ret i32 1
+f:
+  ret i32 2
+}

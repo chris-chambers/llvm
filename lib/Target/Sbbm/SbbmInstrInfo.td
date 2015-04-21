@@ -115,6 +115,19 @@ def : Pat<(i32 (setgt GRRegs:$lhs, i32simm:$rhs)),
 def : Pat<(i32 (setge GRRegs:$lhs, i32simm:$rhs)),
           (i32 (RNG $lhs, imm:$rhs, 2147483647))>;
 
+def : Pat<(i32 (seteq GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (RNG (SUBrr $lhs, $rhs), 0, 0))>;
+def : Pat<(i32 (setne GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (NRNG (SUBrr $lhs, $rhs), 0, 0))>;
+def : Pat<(i32 (setlt GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (RNG (SUBrr $lhs, $rhs), -2147483648, -1))>;
+def : Pat<(i32 (setle GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (RNG (SUBrr $lhs, $rhs), -2147483648, 0))>;
+def : Pat<(i32 (setgt GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (RNG (SUBrr $lhs, $rhs), 1, 2147483647))>;
+def : Pat<(i32 (setge GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (RNG (SUBrr $lhs, $rhs), 0, 2147483647))>;
+
 def : Pat<(brcond AllPredRegs:$cond, bb:$dst),
           (BCOND $cond, $dst)>;
 
