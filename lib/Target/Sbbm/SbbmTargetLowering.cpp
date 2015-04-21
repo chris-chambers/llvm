@@ -25,6 +25,10 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
   setStackPointerRegisterToSaveRestore(Sbbm::SP);
 
   setSchedulingPreference(Sched::RegPressure);
+
+  for (auto VT : MVT::integer_valuetypes()) {
+    setOperationAction(ISD::BR_CC, VT, Expand);
+  }
 }
 
 SDValue SbbmTargetLowering::LowerFormalArguments(

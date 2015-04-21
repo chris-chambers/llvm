@@ -1,7 +1,7 @@
 // FIXME: Add standard header.
 
 #include "SbbmTargetMachine.h"
-#include "SbbmFunctionPasses.h"
+#include "SbbmPasses.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
@@ -40,6 +40,11 @@ TargetPassConfig *SbbmTargetMachine::createPassConfig(PassManagerBase &PM) {
     virtual bool addInstSelector() override {
       addPass(createSbbmISelDag(getTM<SbbmTargetMachine>(), getOptLevel()));
       return false;
+    }
+    virtual void addPreSched2() override {
+      if (getOptLevel() > CodeGenOpt::Less) {
+        addPass(&IfConverterID);
+      }
     }
     virtual void addPreEmitPass() override { }
   };

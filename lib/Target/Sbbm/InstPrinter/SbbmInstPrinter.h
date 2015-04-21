@@ -27,6 +27,7 @@ public:
 
 private:
   void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &O);
+  void printPredicate(const MCInst *MI, raw_ostream &O);
 };
 
 } // namespace llvm
