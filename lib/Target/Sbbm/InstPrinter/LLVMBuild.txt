@@ -4,7 +4,7 @@
 type = Library
 name = SbbmInstPrinter
 parent = Sbbm
-required_libraries = MC Support
+required_libraries = MC Support SbbmInfo
 add_to_library_groups = Sbbm
 
 ; -*- Conf -*-

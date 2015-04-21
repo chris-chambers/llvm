@@ -4,7 +4,7 @@
 type = Library
 name = SbbmInfo
 parent = Sbbm
-required_libraries = Support
+required_libraries = CodeGen Support
 add_to_library_groups = Sbbm
 
 ; -*- Conf -*-

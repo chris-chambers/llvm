@@ -3,7 +3,7 @@
 #ifndef SBBM_INSTRUCTIONINFO_H
 #define SBBM_INSTRUCTIONINFO_H
 
-#include "SbbmRegisterInfo.h"
+#include "TargetInfo/SbbmRegisterInfo.h"
 #include "MCTargetDesc/SbbmMCTargetDesc.h"
 #include "llvm/Target/TargetInstrInfo.h"
 

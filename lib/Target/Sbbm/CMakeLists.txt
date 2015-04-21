@@ -15,7 +15,6 @@ add_llvm_target(SbbmCodeGen
   SbbmFrameLowering.cpp
   SbbmInstrInfo.cpp
   SbbmISelDAGToDAG.cpp
-  SbbmRegisterInfo.cpp
   SbbmSubtarget.cpp
   SbbmTargetLowering.cpp
   SbbmTargetMachine.cpp
