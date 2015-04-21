@@ -86,6 +86,21 @@ void SbbmInstPrinter::printOperand(
   llvm_unreachable("printOperand: unhandled operand kind");
 }
 
+void SbbmInstPrinter::printAddrModeMemSrc(
+  const MCInst *MI, unsigned OpNum, raw_ostream &O)
+{
+  const MCOperand &Op1 = MI->getOperand(OpNum);
+  const MCOperand &Op2 = MI->getOperand(OpNum + 1);
+  O << "[";
+  printRegName(O, Op1.getReg());
+
+  unsigned Offset = Op2.getImm();
+  if (Offset) {
+    O << ", #" << Offset;
+  }
+  O << "]";
+}
+
 void SbbmInstPrinter::printRegName(raw_ostream &OS, unsigned RegNo) const {
   OS << StringRef(getRegisterName(RegNo)).lower();
 }

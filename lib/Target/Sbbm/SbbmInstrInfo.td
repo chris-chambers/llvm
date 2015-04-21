@@ -73,6 +73,41 @@ defm MOVri : SbbmPredInstr<
     [(set i32:$dst, i32simm:$imm)]>;
 }
 
+defm LDR : SbbmPredInstr<
+    "LDR",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "ldr $dst, $addr",
+    [(set i32:$dst, (load addr:$addr))]>;
+
+defm LDRH : SbbmPredInstr<
+    "LDRH",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "ldrh $dst, $addr",
+    [(set i32:$dst, (zextloadi16 addr:$addr))]>;
+
+defm LDRSH : SbbmPredInstr<
+    "LDRSH",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "ldrsh $dst, $addr",
+    [(set i32:$dst, (sextloadi16 addr:$addr))]>;
+
+defm LDRB : SbbmPredInstr<
+    "LDRB",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "ldrb $dst, $addr",
+    [(set i32:$dst, (zextloadi8 addr:$addr))]>;
+
+defm LDRSB : SbbmPredInstr<
+    "LDRSB",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "ldrsb $dst, $addr",
+    [(set i32:$dst, (sextloadi8 addr:$addr))]>;
+
 defm RNG : SbbmPredInstr<
     "RNG",
     (outs PredRegs:$dst),
