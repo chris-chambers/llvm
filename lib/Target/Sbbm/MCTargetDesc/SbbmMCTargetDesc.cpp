@@ -3,6 +3,7 @@
 #include "SbbmMCTargetDesc.h"
 #include "SbbmMCAsmInfo.h"
 #include "TargetInfo/SbbmTargetInfo.h"
+#include "llvm/MC/MCCodeGenInfo.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/Support/TargetRegistry.h"
@@ -22,6 +23,14 @@ namespace {
 
 static MCAsmInfo *createMCAsmInfo(const MCRegisterInfo &MRI, StringRef TT) {
   return new SbbmMCAsmInfo(TT);
+}
+
+MCCodeGenInfo *createMCCodeGenInfo(
+  StringRef TT, Reloc::Model RM, CodeModel::Model CM, CodeGenOpt::Level OL)
+{
+  auto GenInfo = new MCCodeGenInfo();
+  GenInfo->InitMCCodeGenInfo(RM, CM, OL);
+  return GenInfo;
 }
 
 static MCInstrInfo *createMCInstrInfo() {
@@ -48,6 +57,7 @@ static MCSubtargetInfo *createMCSubtargetInfo(
 
 extern "C" void LLVMInitializeSbbmTargetMC() {
   TargetRegistry::RegisterMCAsmInfo(TheSbbmTarget, createMCAsmInfo);
+  TargetRegistry::RegisterMCCodeGenInfo(TheSbbmTarget, createMCCodeGenInfo);
   TargetRegistry::RegisterMCInstrInfo(TheSbbmTarget, createMCInstrInfo);
   TargetRegistry::RegisterMCRegInfo(TheSbbmTarget, createMCRegInfo);
   TargetRegistry::RegisterMCSubtargetInfo(TheSbbmTarget, createMCSubtargetInfo);
