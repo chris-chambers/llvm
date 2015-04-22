@@ -24,8 +24,7 @@ public:
   /// always be able to get register info as well (through this method).
   const SbbmRegisterInfo &getRegisterInfo() const { return RI; }
 
-  virtual bool SbbmInstrInfo::expandPostRAPseudo(MachineBasicBlock::iterator MI)
-    const override;
+  virtual bool expandPostRAPseudo(MachineBasicBlock::iterator MI) const override;
 
   virtual bool AnalyzeBranch(
     MachineBasicBlock &MBB, MachineBasicBlock *&TBB, MachineBasicBlock *&FBB,
@@ -85,8 +84,9 @@ public:
     MachineInstr *MI, std::vector<MachineOperand> &Pred) const override
   {
     switch (MI->getOpcode()) {
-    case Sbbm::RNG:
-    case Sbbm::NRNG:
+    case Sbbm::SRNG:
+    case Sbbm::SRNG_NOT:
+    case Sbbm::URNG:
       Pred.push_back(MI->getOperand(0));
       break;
     }

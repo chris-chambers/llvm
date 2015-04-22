@@ -108,17 +108,23 @@ defm LDRSB : SbbmPredInstr<
     "ldrsb $dst, $addr",
     [(set i32:$dst, (sextloadi8 addr:$addr))]>;
 
-defm RNG : SbbmPredInstr<
-    "RNG",
+defm SRNG : SbbmPredInstr<
+    "SRNG",
     (outs PredRegs:$dst),
     (ins GRRegs:$src, i32imm:$low, i32imm:$high),
-    "rng $dst, $src, $low, $high">;
+    "srng $dst, $src, $low, $high">;
 
-defm NRNG : SbbmPredInstr<
-    "NRNG",
+defm SRNG_NOT : SbbmPredInstr<
+    "SRNG_NOT",
     (outs NPredRegs:$dst),
     (ins GRRegs:$src, i32imm:$low, i32imm:$high),
-    "rng $dst, $src, $low, $high">;
+    "srng $dst, $src, $low, $high">;
+
+defm URNG : SbbmPredInstr<
+    "URNG",
+    (outs PredRegs:$dst),
+    (ins GRRegs:$src, i32imm:$low, i32imm:$high),
+    "urng $dst, $src, $low, $high">;
 
 let isTerminator = 1, isBranch = 1 in {
 
@@ -148,31 +154,53 @@ def SEL : SbbmInstr<
     let isPseudo = 1;
 }
 
+// Signed
 def : Pat<(i32 (seteq GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (RNG $lhs, imm:$rhs, imm:$rhs))>;
+          (i32 (SRNG $lhs, imm:$rhs, imm:$rhs))>;
 def : Pat<(i32 (setne GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (NRNG $lhs, imm:$rhs, imm:$rhs))>;
+          (i32 (SRNG_NOT $lhs, imm:$rhs, imm:$rhs))>;
 def : Pat<(i32 (setlt GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (RNG $lhs, -2147483648, (dec imm:$rhs)))>;
+          (i32 (SRNG $lhs, -2147483648, (dec imm:$rhs)))>;
 def : Pat<(i32 (setle GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (RNG $lhs, -2147483648, imm:$rhs))>;
+          (i32 (SRNG $lhs, -2147483648, imm:$rhs))>;
 def : Pat<(i32 (setgt GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (RNG $lhs, (inc imm:$rhs), 2147483647))>;
+          (i32 (SRNG $lhs, (inc imm:$rhs), 2147483647))>;
 def : Pat<(i32 (setge GRRegs:$lhs, i32simm:$rhs)),
-          (i32 (RNG $lhs, imm:$rhs, 2147483647))>;
+          (i32 (SRNG $lhs, imm:$rhs, 2147483647))>;
+// Unsigned
+def : Pat<(i32 (setult GRRegs:$lhs, i32simm:$rhs)),
+          (i32 (URNG $lhs, 0, (dec imm:$rhs)))>;
+def : Pat<(i32 (setule GRRegs:$lhs, i32simm:$rhs)),
+          (i32 (URNG $lhs, 0, imm:$rhs))>;
+def : Pat<(i32 (setugt GRRegs:$lhs, i32simm:$rhs)),
+          (i32 (URNG $lhs, (inc imm:$rhs), 4294967295))>;
+def : Pat<(i32 (setuge GRRegs:$lhs, i32simm:$rhs)),
+          (i32 (URNG $lhs, imm:$rhs, 4294967295))>;
 
+// Signed
 def : Pat<(i32 (seteq GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (RNG (SUBrr $lhs, $rhs), 0, 0))>;
+          (i32 (SRNG (SUBrr $lhs, $rhs), 0, 0))>;
 def : Pat<(i32 (setne GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (NRNG (SUBrr $lhs, $rhs), 0, 0))>;
+          (i32 (SRNG_NOT (SUBrr $lhs, $rhs), 0, 0))>;
 def : Pat<(i32 (setlt GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (RNG (SUBrr $lhs, $rhs), -2147483648, -1))>;
+          (i32 (SRNG (SUBrr $lhs, $rhs), -2147483648, -1))>;
 def : Pat<(i32 (setle GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (RNG (SUBrr $lhs, $rhs), -2147483648, 0))>;
+          (i32 (SRNG (SUBrr $lhs, $rhs), -2147483648, 0))>;
 def : Pat<(i32 (setgt GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (RNG (SUBrr $lhs, $rhs), 1, 2147483647))>;
+          (i32 (SRNG (SUBrr $lhs, $rhs), 1, 2147483647))>;
 def : Pat<(i32 (setge GRRegs:$lhs, GRRegs:$rhs)),
-          (i32 (RNG (SUBrr $lhs, $rhs), 0, 2147483647))>;
+          (i32 (SRNG (SUBrr $lhs, $rhs), 0, 2147483647))>;
+// Unsigned
+// FIXME: These unsigned patterns are wrong.  You can't do signed 32-bit
+//        subtraction on unsigned 32-bit operands and expect it to work.
+def : Pat<(i32 (setult GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (SRNG (SUBrr $lhs, $rhs), -2147483648, -1))>;
+def : Pat<(i32 (setule GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (SRNG (SUBrr $lhs, $rhs), -2147483648, 0))>;
+def : Pat<(i32 (setugt GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (SRNG (SUBrr $lhs, $rhs), 1, 2147483647))>;
+def : Pat<(i32 (setuge GRRegs:$lhs, GRRegs:$rhs)),
+          (i32 (URNG (SUBrr $lhs, $rhs), 0, 2147483647))>;
 
 def : Pat<(brcond AllPredRegs:$cond, bb:$dst),
           (BCOND $cond, $dst)>;
