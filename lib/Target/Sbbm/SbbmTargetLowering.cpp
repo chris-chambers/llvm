@@ -28,6 +28,7 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
 
   for (auto VT : MVT::integer_valuetypes()) {
     setOperationAction(ISD::BR_CC, VT, Expand);
+    setOperationAction(ISD::SELECT_CC, VT, Expand);
   }
 }
 

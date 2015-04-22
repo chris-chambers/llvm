@@ -24,6 +24,9 @@ public:
   /// always be able to get register info as well (through this method).
   const SbbmRegisterInfo &getRegisterInfo() const { return RI; }
 
+  virtual bool SbbmInstrInfo::expandPostRAPseudo(MachineBasicBlock::iterator MI)
+    const override;
+
   virtual bool AnalyzeBranch(
     MachineBasicBlock &MBB, MachineBasicBlock *&TBB, MachineBasicBlock *&FBB,
     SmallVectorImpl<MachineOperand> &Cond, bool AllowModify)

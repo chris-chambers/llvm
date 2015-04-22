@@ -125,7 +125,10 @@ let isTerminator = 1, isBranch = 1 in {
 def BCOND : SbbmInstr<
     (outs),
     (ins AllPredRegs:$cond, brtarget:$dst),
-    "; BCOND needs to be eliminated">;
+    "; BCOND needs to be eliminated">
+{
+    let isPseudo = 1;
+}
 
 let isBarrier = 1 in {
 defm B : SbbmPredInstr<
@@ -135,6 +138,14 @@ defm B : SbbmPredInstr<
     [(br bb:$target)]>;
 }
 
+}
+
+def SEL : SbbmInstr<
+    (outs GRRegs:$dst),
+    (ins AllPredRegs:$cond, GRRegs:$T, GRRegs:$F),
+    "; SEL needs to be eliminated">
+{
+    let isPseudo = 1;
 }
 
 def : Pat<(i32 (seteq GRRegs:$lhs, i32simm:$rhs)),
@@ -165,6 +176,9 @@ def : Pat<(i32 (setge GRRegs:$lhs, GRRegs:$rhs)),
 
 def : Pat<(brcond AllPredRegs:$cond, bb:$dst),
           (BCOND $cond, $dst)>;
+
+def : Pat<(select AllPredRegs:$cond, GRRegs:$T, GRRegs:$F),
+          (SEL $cond, $T, $F)>;
 
 let isTerminator = 1, isReturn = 1, isBarrier = 1 in {
 

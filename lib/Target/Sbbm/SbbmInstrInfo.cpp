@@ -53,6 +53,37 @@ void SbbmInstrInfo::copyPhysReg(
     .addReg(SrcReg, getKillRegState(KillSrc));
 }
 
+bool SbbmInstrInfo::expandPostRAPseudo(MachineBasicBlock::iterator MI) const {
+  if (MI->getOpcode() == Sbbm::SEL) {
+    DebugLoc DL = MI->getDebugLoc();
+    MachineBasicBlock &MBB = *MI->getParent();
+
+    const MachineOperand &Dst = MI->getOperand(0);
+    const MachineOperand &Cond = MI->getOperand(1);
+    const MachineOperand &TVal = MI->getOperand(2);
+    const MachineOperand &FVal = MI->getOperand(3);
+
+    if (Dst.getReg() != TVal.getReg()) {
+      BuildMI(MBB, MI, DL, get(Sbbm::MOVrr_P))
+        .addReg(Dst.getReg())
+        .addReg(TVal.getReg())
+        .addReg(Cond.getReg());
+    }
+
+    if (Dst.getReg() != FVal.getReg()) {
+      BuildMI(MBB, MI, DL, get(Sbbm::MOVrr_P))
+        .addReg(Dst.getReg())
+        .addReg(FVal.getReg())
+        .addReg(ReversePredReg(Cond.getReg()));
+    }
+
+    MBB.erase(MI);
+    return true;
+  }
+
+  return false;
+}
+
 bool SbbmInstrInfo::AnalyzeBranch(
   MachineBasicBlock &MBB, MachineBasicBlock *&TBB, MachineBasicBlock *&FBB,
   SmallVectorImpl<MachineOperand> &Cond, bool AllowModify = false)
