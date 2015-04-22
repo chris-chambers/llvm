@@ -13,6 +13,7 @@ namespace ISD {
 
 enum NodeType {
   FIRST_NUMBER = llvm::ISD::BUILTIN_OP_END,
+  CALL,
   WRAPPER,
   HALT_FLAG,
   RET_FLAG,
@@ -28,6 +29,10 @@ public:
 
   virtual const char *getTargetNodeName(unsigned Opcode) const override;
 
+  virtual SDValue LowerCall(
+    TargetLowering::CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals)
+    const override;
+
   virtual SDValue LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool isVarArg,
     const SmallVectorImpl<ISD::InputArg> &Ins, SDLoc DL, SelectionDAG &DAG,
@@ -40,6 +45,13 @@ public:
     const SmallVectorImpl<ISD::OutputArg> &Outs,
     const SmallVectorImpl<SDValue> &OutVals, SDLoc DL, SelectionDAG &DAG)
     const override;
+
+private:
+  SDValue LowerCallResult(
+    SDValue Chain, SDValue InGlue, CallingConv::ID CallConv, bool isVarArg,
+    const SmallVectorImpl<ISD::InputArg> &Ins, SDLoc dl, SelectionDAG &DAG,
+    SmallVectorImpl<SDValue> &InVals)
+    const;
 };
 
 } // namespace llvm

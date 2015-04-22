@@ -9,3 +9,22 @@ def SbbmHaltFlag : SDNode<
     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
 
 def SbbmWrapper : SDNode<"Sbbm::ISD::WRAPPER", SDTIntUnaryOp>;
+
+def SDT_SbbmCallSeqStart : SDCallSeqStart<[SDTCisVT<0, i32>]>;
+def SDT_SbbmCallSeqEnd   : SDCallSeqEnd<[
+  SDTCisVT<0, i32>, SDTCisVT<1, i32>
+]>;
+
+def callseq_start : SDNode<
+    "ISD::CALLSEQ_START", SDT_SbbmCallSeqStart,
+    [SDNPHasChain, SDNPOutGlue]>;
+def callseq_end : SDNode<
+    "ISD::CALLSEQ_END", SDT_SbbmCallSeqEnd,
+    [SDNPHasChain, SDNPOptInGlue, SDNPOutGlue]>;
+
+def SDT_SbbmCall  : SDTypeProfile<0, -1, [SDTCisPtrTy<0>]>;
+
+// Custom SDNodes
+def sbbm_call : SDNode<
+    "Sbbm::ISD::CALL", SDT_SbbmCall,
+    [ SDNPHasChain, SDNPOptInGlue, SDNPOutGlue, SDNPVariadic ]>;

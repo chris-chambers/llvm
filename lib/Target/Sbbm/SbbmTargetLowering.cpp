@@ -35,11 +35,149 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
 
 const char *SbbmTargetLowering::getTargetNodeName(unsigned Opcode) const {
   switch (Opcode) {
+  case Sbbm::ISD::CALL: return "Call";
   case Sbbm::ISD::WRAPPER: return "Wrapper";
   case Sbbm::ISD::HALT_FLAG: return "HaltFlag";
   case Sbbm::ISD::RET_FLAG: return "RetFlag";
   default: return TargetLowering::getTargetNodeName(Opcode);
   }
+}
+
+SDValue SbbmTargetLowering::LowerCall(
+  TargetLowering::CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals) const
+{
+  SelectionDAG &DAG = CLI.DAG;
+  SDLoc &dl = CLI.DL;
+  SmallVectorImpl<ISD::OutputArg> &Outs = CLI.Outs;
+  SmallVectorImpl<SDValue> &OutVals = CLI.OutVals;
+  SmallVectorImpl<ISD::InputArg> &Ins = CLI.Ins;
+  SDValue Chain = CLI.Chain;
+  SDValue Callee = CLI.Callee;
+  bool &isTailCall = CLI.IsTailCall;
+  CallingConv::ID CallConv = CLI.CallConv;
+  bool isVarArg = CLI.IsVarArg;
+
+  const MachineFunction &MachineFunction = DAG.getMachineFunction();
+  const Function &Function = *MachineFunction.getFunction();
+
+  if (isVarArg) {
+    llvm_unreachable("var args are not implemented");
+  }
+
+  if (isTailCall) {
+    llvm_unreachable("tail calls are not implemented");
+  }
+
+  // Analyze operands of the call, assigning locations to each operand.
+  SmallVector<CCValAssign, 16> ArgLocs;
+  CCState CCInfo(CallConv, isVarArg, DAG.getMachineFunction(), ArgLocs,
+                 *DAG.getContext());
+  CCInfo.AnalyzeCallOperands(Outs, CC_Sbbm);
+
+  // Get the size of the outgoing arguments stack space requirement.
+  const unsigned NumBytes = CCInfo.getNextStackOffset();
+
+  Chain =
+      DAG.getCALLSEQ_START(Chain, DAG.getIntPtrConstant(NumBytes, true), dl);
+
+  SmallVector<std::pair<unsigned, SDValue>, 8> RegsToPass;
+  SmallVector<SDValue, 8> MemOpChains;
+
+  // Walk the register/memloc assignments, inserting copies/loads.
+  for (unsigned i = 0, realArgIdx = 0, e = ArgLocs.size(); i != e;
+       ++i, ++realArgIdx) {
+    CCValAssign &VA = ArgLocs[i];
+    SDValue Arg = OutVals[realArgIdx];
+
+    // We only handle fully promoted arguments.
+    assert(VA.getLocInfo() == CCValAssign::Full && "Unhandled loc info");
+
+    if (!VA.isRegLoc()) {
+      llvm_unreachable("Only passing paramters via registers");
+    }
+
+    RegsToPass.push_back(std::make_pair(VA.getLocReg(), Arg));
+  }
+
+  // Build a sequence of copy-to-reg nodes chained together with token chain
+  // and flag operands which copy the outgoing args into the appropriate regs.
+  SDValue InFlag;
+
+  for (auto &Reg : RegsToPass) {
+    Chain = DAG.getCopyToReg(Chain, dl, Reg.first, Reg.second, InFlag);
+    InFlag = Chain.getValue(1);
+  }
+
+  std::vector<SDValue> Ops;
+  Ops.push_back(Chain);
+
+  if (GlobalAddressSDNode *G = dyn_cast<GlobalAddressSDNode>(Callee)) {
+    Ops.push_back(DAG.getTargetGlobalAddress(G->getGlobal(), dl, MVT::i32));
+  } else if (ExternalSymbolSDNode *ES = dyn_cast<ExternalSymbolSDNode>(Callee)) {
+    Ops.push_back(SDValue(ES, 0));
+  } else {
+    llvm_unreachable("unsupported call type");
+  }
+
+  // Add argument registers to the end of the list so that they are known live
+  // into the call.
+  for (auto &Reg : RegsToPass) {
+    Ops.push_back(DAG.getRegister(Reg.first, Reg.second.getValueType()));
+  }
+
+  // Add a register mask operand representing the call-preserved registers.
+  const uint32_t *Mask;
+  const TargetRegisterInfo *TRI =
+      getTargetMachine().getSubtargetImpl(Function)->getRegisterInfo();
+  Mask = TRI->getCallPreservedMask(CallConv);
+
+  assert(Mask && "Missing call preserved mask for calling convention");
+  Ops.push_back(DAG.getRegisterMask(Mask));
+
+  if (InFlag.getNode()) {
+    Ops.push_back(InFlag);
+  }
+
+  SDVTList NodeTys = DAG.getVTList(MVT::Other, MVT::Glue);
+
+  // Returns a chain and a flag for retval copy to use.
+  Chain = DAG.getNode(Sbbm::ISD::CALL, dl, NodeTys, Ops);
+  InFlag = Chain.getValue(1);
+
+  Chain = DAG.getCALLSEQ_END(Chain, DAG.getIntPtrConstant(NumBytes, true),
+                             DAG.getIntPtrConstant(0, true), InFlag, dl);
+  if (!Ins.empty()) {
+    InFlag = Chain.getValue(1);
+  }
+
+  // Handle result values, copying them out of physregs into vregs that we
+  // return.
+  return LowerCallResult(Chain, InFlag, CallConv, isVarArg, Ins, dl, DAG,
+                         InVals);
+}
+
+SDValue SbbmTargetLowering::LowerCallResult(
+    SDValue Chain, SDValue InGlue, CallingConv::ID CallConv, bool isVarArg,
+    const SmallVectorImpl<ISD::InputArg> &Ins, SDLoc dl, SelectionDAG &DAG,
+    SmallVectorImpl<SDValue> &InVals) const {
+  assert(!isVarArg && "Unsupported");
+
+  // Assign locations to each value returned by this call.
+  SmallVector<CCValAssign, 16> RVLocs;
+  CCState CCInfo(CallConv, isVarArg, DAG.getMachineFunction(), RVLocs,
+                 *DAG.getContext());
+
+  CCInfo.AnalyzeCallResult(Ins, RetCC_Sbbm);
+
+  // Copy all of the result registers out of their specified physreg.
+  for (auto &Loc : RVLocs) {
+    Chain = DAG.getCopyFromReg(Chain, dl, Loc.getLocReg(), Loc.getValVT(),
+                               InGlue).getValue(1);
+    InGlue = Chain.getValue(2);
+    InVals.push_back(Chain.getValue(0));
+  }
+
+  return Chain;
 }
 
 SDValue SbbmTargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {

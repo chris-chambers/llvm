@@ -257,3 +257,24 @@ defm B_LR : SbbmPredInstr<"B_LR", (outs), (ins variable_ops), "b lr", [(SbbmRetF
 defm HALT : SbbmPredInstr<"HALT", (outs), (ins variable_ops), "halt", [(SbbmHaltFlag)]>;
 
 }
+
+let isCall = 1, isBranch = 1, Defs = [LR], Uses = [SP] in {
+
+def CALL : SbbmInstr<
+    (outs), (ins GRRegs:$addr),
+    "bl $addr",
+    [(sbbm_call i32:$addr)]>;
+}
+
+let isPseudo = 1 in {
+
+def ADJCALLSTACKDOWN : SbbmInstr<
+    (outs), (ins i32imm:$amt),
+    "; ADJCALLSTACKDOWN $amt",
+    [(callseq_start timm:$amt)]>;
+
+def ADJCALLSTACKUP : SbbmInstr<
+    (outs), (ins i32imm:$amt1, i32imm:$amt2),
+    "; ADJCALLSTACKUP $amt1 $amt2",
+    [(callseq_end timm:$amt1, timm:$amt2)]>;
+}
