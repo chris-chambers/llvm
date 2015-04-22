@@ -13,6 +13,7 @@ namespace ISD {
 
 enum NodeType {
   FIRST_NUMBER = llvm::ISD::BUILTIN_OP_END,
+  WRAPPER,
   HALT_FLAG,
   RET_FLAG,
 };
@@ -25,10 +26,14 @@ class SbbmTargetLowering : public TargetLowering {
 public:
   explicit SbbmTargetLowering(const SbbmTargetMachine &TM);
 
+  virtual const char *getTargetNodeName(unsigned Opcode) const override;
+
   virtual SDValue LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool isVarArg,
     const SmallVectorImpl<ISD::InputArg> &Ins, SDLoc DL, SelectionDAG &DAG,
     SmallVectorImpl<SDValue> &InVals) const override;
+
+  virtual SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
 
   virtual SDValue LowerReturn(
     SDValue Chain, CallingConv::ID CallConv, bool isVarArg,

@@ -64,6 +64,18 @@ defm MOVrr : SbbmPredInstr<
     (ins GRRegs:$src),
     "mov $dst, $src">;
 
+// FIXME: MOVra may be the wrong name here.  This moves an address of some kind
+//        into a register (just the address, not the contents).
+defm MOVra : SbbmPredInstr<
+    "MOVra",
+    (outs GRRegs:$dst),
+    (ins memsrc:$addr),
+    "mov $dst, $addr",
+    [(set i32:$dst, addr:$addr)]>;
+
+def : Pat<(SbbmWrapper tglobaladdr:$addr),
+          (MOVra $addr)>;
+
 let isMoveImm = 1 in {
 defm MOVri : SbbmPredInstr<
     "MOVri",
@@ -101,12 +113,43 @@ defm LDRB : SbbmPredInstr<
     "ldrb $dst, $addr",
     [(set i32:$dst, (zextloadi8 addr:$addr))]>;
 
+def : Pat<(extloadi16 addr:$addr),
+          (LDRH $addr)>;
+def : Pat<(extloadi16 (SbbmWrapper tglobaladdr:$addr)),
+          (LDRH $addr)>;
+
+def : Pat<(extloadi8 addr:$addr),
+          (LDRB $addr)>;
+def : Pat<(extloadi8 (SbbmWrapper tglobaladdr:$addr)),
+          (LDRB $addr)>;
+
 defm LDRSB : SbbmPredInstr<
     "LDRSB",
     (outs GRRegs:$dst),
     (ins memsrc:$addr),
     "ldrsb $dst, $addr",
     [(set i32:$dst, (sextloadi8 addr:$addr))]>;
+
+defm STR : SbbmPredInstr<
+    "STR",
+    (outs),
+    (ins GRRegs:$src, memsrc:$addr),
+    "str $src, $addr",
+    [(store i32:$src, addr:$addr)]>;
+
+defm STRH : SbbmPredInstr<
+    "STRH",
+    (outs),
+    (ins GRRegs:$src, memsrc:$addr),
+    "strh $src, $addr",
+    [(truncstorei16 i32:$src, addr:$addr)]>;
+
+defm STRB : SbbmPredInstr<
+    "STRB",
+    (outs),
+    (ins GRRegs:$src, memsrc:$addr),
+    "strb $src, $addr",
+    [(truncstorei8 i32:$src, addr:$addr)]>;
 
 defm SRNG : SbbmPredInstr<
     "SRNG",

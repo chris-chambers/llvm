@@ -1,8 +1,11 @@
 // FIXME: Add standard header.
 
 #include "SbbmFrameLowering.h"
+#include "SbbmInstrInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
+#include "llvm/CodeGen/MachineInstrBuilder.h"
+#include "llvm/Target/TargetInstrInfo.h"
 #include "llvm/Target/TargetSubtargetInfo.h"
 
 using namespace llvm;
@@ -30,7 +33,15 @@ void SbbmFrameLowering::emitPrologue(MachineFunction &MF) const {
     return;
   }
 
-  llvm_unreachable("prologue with non-zero stack size not yet implemented.");
+  const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
+  MachineBasicBlock &MBB = MF.front();
+  MachineBasicBlock::iterator MBBI = MBB.begin();
+  DebugLoc DL = MBBI != MBB.end() ? MBBI->getDebugLoc() : DebugLoc();
+
+  BuildMI(MBB, MBBI, DL, TII.get(Sbbm::SUBri), Sbbm::SP)
+      .addReg(Sbbm::SP)
+      .addImm(StackSize)
+      .setMIFlag(MachineInstr::FrameSetup);
 }
 
 void SbbmFrameLowering::emitEpilogue(
@@ -42,7 +53,14 @@ void SbbmFrameLowering::emitEpilogue(
     return;
   }
 
-  llvm_unreachable("epilogue with non-zero stack size not yet implemented.");
+  const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
+  MachineBasicBlock::iterator MBBI = MBB.getLastNonDebugInstr();
+  DebugLoc DL = MBBI->getDebugLoc();
+
+  BuildMI(MBB, MBBI, DL, TII.get(Sbbm::ADDri), Sbbm::SP)
+      .addReg(Sbbm::SP)
+      .addImm(StackSize)
+      .setMIFlag(MachineInstr::FrameSetup);
 }
 
 namespace {

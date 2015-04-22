@@ -14,6 +14,9 @@ struct SbbmRegisterInfo : public SbbmGenRegisterInfo {
 public:
   SbbmRegisterInfo();
 
+  virtual bool requiresRegisterScavenging(const MachineFunction &MF)
+    const override;
+
   virtual const uint16_t *getCalleeSavedRegs(const MachineFunction *MF = nullptr)
     const override;
 

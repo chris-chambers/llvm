@@ -29,12 +29,11 @@ public:
     return SelectCode(N);
   }
 
-  bool SelectAddr(SDValue Addr, SDValue &Base, SDValue &Offset) {
+  bool SelectAddr(SDValue Addr, SDValue &Base) {
     EVT ValTy = Addr.getValueType();
 
     if (FrameIndexSDNode *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
       Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), ValTy);
-      Offset = CurDAG->getTargetConstant(0, ValTy);
       return true;
     }
 
@@ -45,7 +44,6 @@ public:
     }
 
     Base = Addr;
-    Offset = CurDAG->getTargetConstant(0, ValTy);
     return true;
   }
 

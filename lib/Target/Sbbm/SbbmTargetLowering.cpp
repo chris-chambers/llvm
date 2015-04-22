@@ -29,7 +29,27 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
   for (auto VT : MVT::integer_valuetypes()) {
     setOperationAction(ISD::BR_CC, VT, Expand);
     setOperationAction(ISD::SELECT_CC, VT, Expand);
+    setOperationAction(ISD::GlobalAddress, VT, Custom);
   }
+}
+
+const char *SbbmTargetLowering::getTargetNodeName(unsigned Opcode) const {
+  switch (Opcode) {
+  case Sbbm::ISD::WRAPPER: return "Wrapper";
+  case Sbbm::ISD::HALT_FLAG: return "HaltFlag";
+  case Sbbm::ISD::RET_FLAG: return "RetFlag";
+  default: return TargetLowering::getTargetNodeName(Opcode);
+  }
+}
+
+SDValue SbbmTargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
+  if (Op.getOpcode() == ISD::GlobalAddress) {
+    const GlobalValue *GV = cast<GlobalAddressSDNode>(Op.getNode())->getGlobal();
+    SDLoc DL(Op);
+    SDValue G = DAG.getTargetGlobalAddress(GV, DL, getPointerTy());
+    return DAG.getNode(Sbbm::ISD::WRAPPER, DL, getPointerTy(), G);
+  }
+  return TargetLowering::LowerOperation(Op, DAG);
 }
 
 SDValue SbbmTargetLowering::LowerFormalArguments(

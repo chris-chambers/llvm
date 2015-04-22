@@ -7,3 +7,5 @@ def SbbmRetFlag : SDNode<
 def SbbmHaltFlag : SDNode<
     "Sbbm::ISD::HALT_FLAG", SDTNone,
     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
+def SbbmWrapper : SDNode<"Sbbm::ISD::WRAPPER", SDTIntUnaryOp>;
