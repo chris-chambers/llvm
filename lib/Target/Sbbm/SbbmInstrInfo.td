@@ -28,6 +28,10 @@ let isCommutable = 1 in {
 defm ADDrr : SbbmBinOp<"add", add>;
 defm ADDri : SbbmBinImm<"add", add>;
 
+// FIXME: ADDC and ADDE are not really supported (yet).
+defm ADDCrr : SbbmBinOp<"add", addc>;
+defm ADDErr : SbbmBinOp<"add", adde>;
+
 defm MULrr : SbbmBinOp<"mul", mul>;
 
 }
@@ -35,8 +39,15 @@ defm MULrr : SbbmBinOp<"mul", mul>;
 defm SUBrr : SbbmBinOp<"sub", sub>;
 defm SUBri : SbbmBinImm<"sub", sub>;
 
+// FIXME: SUBC and SUBE are not really supported (yet).
+defm SUBCrr : SbbmBinOp<"sub", subc>;
+defm SUBErr : SbbmBinOp<"sub", sube>;
+
 defm SDIVrr : SbbmBinOp<"sdiv", sdiv>;
 defm SREMrr : SbbmBinOp<"srem", srem>;
+
+defm UDIVrr : SbbmBinOp<"udiv", udiv>;
+defm UREMrr : SbbmBinOp<"urem", urem>;
 
 // Bitwise and, or, exclusive-or
 defm ANDrr : SbbmBinOp<"and", and>;
@@ -175,6 +186,15 @@ def BCOND : SbbmInstr<
     (outs),
     (ins AllPredRegs:$cond, brtarget:$dst),
     "; BCOND needs to be eliminated">
+{
+    let isPseudo = 1;
+}
+
+def B_IND : SbbmInstr<
+    (outs),
+    (ins GRRegs:$dst),
+    "; B_IND needs to be eliminated",
+    [(brind i32:$dst)]>
 {
     let isPseudo = 1;
 }

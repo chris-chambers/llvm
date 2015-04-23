@@ -27,10 +27,38 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
   setSchedulingPreference(Sched::RegPressure);
 
   for (auto VT : MVT::integer_valuetypes()) {
-    setOperationAction(ISD::BR_CC, VT, Expand);
-    setOperationAction(ISD::SELECT_CC, VT, Expand);
     setOperationAction(ISD::GlobalAddress, VT, Custom);
+
+    for (auto Op : {
+      ISD::BR_CC,
+      ISD::SELECT_CC,
+
+      ISD::SHL_PARTS,
+      ISD::SRL_PARTS,
+      ISD::SRA_PARTS,
+
+      ISD::SMUL_LOHI,
+      ISD::UMUL_LOHI,
+
+      ISD::MULHS,
+      ISD::MULHU,
+
+      ISD::CTPOP,
+      ISD::CTLZ,
+      ISD::CTLZ_ZERO_UNDEF,
+      ISD::CTTZ,
+      ISD::CTTZ_ZERO_UNDEF,
+
+      ISD::BSWAP,
+    }) {
+      setOperationAction(Op, VT, Expand);
+    }
+
+    // TODO: Sign extension in register can be implemented directly.
+    setOperationAction(ISD::SIGN_EXTEND_INREG, VT, Expand);
   }
+  setOperationAction(ISD::BR_JT, MVT::Other, Expand);
+  setOperationAction(ISD::BRIND, MVT::Other, Expand);
 }
 
 const char *SbbmTargetLowering::getTargetNodeName(unsigned Opcode) const {
