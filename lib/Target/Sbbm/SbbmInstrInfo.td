@@ -260,11 +260,18 @@ defm HALT : SbbmPredInstr<"HALT", (outs), (ins variable_ops), "halt", [(SbbmHalt
 
 let isCall = 1, isBranch = 1, Defs = [LR], Uses = [SP] in {
 
-def CALL : SbbmInstr<
+defm CALL : SbbmPredInstr<
+    "CALL",
     (outs), (ins GRRegs:$addr),
     "bl $addr",
     [(sbbm_call i32:$addr)]>;
 }
+
+def : Pat<(sbbm_call texternalsym:$dst),
+          (CALL texternalsym:$dst)>;
+
+def : Pat<(sbbm_call externalsym:$dst),
+          (CALL texternalsym:$dst)>;
 
 let isPseudo = 1 in {
 

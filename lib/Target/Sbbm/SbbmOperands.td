@@ -12,4 +12,4 @@ def memsrc : Operand<i32> {
 //       the method given in the third parameter.  And, the number and types
 //       should match with an Operand<> type (the MIOperandInfo field) that
 //       receives these nodes.  For instance, 'addr' matches with memsrc.
-def addr : ComplexPattern<iPTR, 1, "SelectAddr", [frameindex], []>;
+def addr : ComplexPattern<iPTR, 1, "SelectAddr", [frameindex, externalsym, texternalsym], []>;

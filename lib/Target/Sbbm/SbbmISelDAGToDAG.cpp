@@ -37,6 +37,11 @@ public:
       return true;
     }
 
+    if (ExternalSymbolSDNode *ESN = dyn_cast<ExternalSymbolSDNode>(Addr)) {
+      Base = CurDAG->getTargetExternalSymbol(ESN->getSymbol(), ESN->getValueType(0));
+      return true;
+    }
+
     if (Addr.getOpcode() == ISD::TargetExternalSymbol ||
         Addr.getOpcode() == ISD::TargetGlobalAddress ||
         Addr.getOpcode() == ISD::TargetGlobalTLSAddress) {
