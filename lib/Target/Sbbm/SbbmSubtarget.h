@@ -26,6 +26,7 @@ public:
   virtual const TargetFrameLowering *getFrameLowering() const override;
   virtual const SbbmInstrInfo *getInstrInfo() const override;
   virtual const SbbmRegisterInfo *getRegisterInfo() const override;
+  virtual const TargetSelectionDAGInfo *getSelectionDAGInfo() const override;
   virtual const SbbmTargetLowering *getTargetLowering() const override {
     return &TargetLowering;
   }

@@ -29,6 +29,18 @@ public:
 
   virtual const char *getTargetNodeName(unsigned Opcode) const override;
 
+  virtual bool shouldExpandAtomicStoreInIR(StoreInst *SI) const override {
+    return true;
+  }
+
+  virtual bool shouldExpandAtomicLoadInIR(LoadInst *LI) const override {
+    return true;
+  }
+
+  virtual bool shouldExpandAtomicRMWInIR(AtomicRMWInst *RMWI) const override {
+    return true;
+  }
+
   virtual SDValue LowerCall(
     TargetLowering::CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals)
     const override;

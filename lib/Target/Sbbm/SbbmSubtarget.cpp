@@ -3,6 +3,7 @@
 #include "SbbmSubtarget.h"
 #include "SbbmFrameLowering.h"
 #include "llvm/IR/DataLayout.h"
+#include "llvm/Target/TargetSelectionDAGInfo.h"
 
 #define DEBUG_TYPE "sbbm-subtarget"
 
@@ -12,14 +13,7 @@
 
 using namespace llvm;
 
-SbbmSubtarget::SbbmSubtarget(
-  const std::string &TT, const std::string &CPU, const std::string &FS,
-  const SbbmTargetMachine &TM)
-  : SbbmGenSubtargetInfo(TT, CPU, FS)
-  , TargetLowering(TM)
-{ }
-
-const DataLayout *SbbmSubtarget::getDataLayout() const {
+namespace {
   // See: http://llvm.org/docs/LangRef.html#data-layout
   static const DataLayout DL(
     "e-"
@@ -31,7 +25,16 @@ const DataLayout *SbbmSubtarget::getDataLayout() const {
     "i64:32-"
     "a:0:32-"
     "n32");
+}
 
+SbbmSubtarget::SbbmSubtarget(
+  const std::string &TT, const std::string &CPU, const std::string &FS,
+  const SbbmTargetMachine &TM)
+  : SbbmGenSubtargetInfo(TT, CPU, FS)
+  , TargetLowering(TM)
+{ }
+
+const DataLayout *SbbmSubtarget::getDataLayout() const {
   return &DL;
 }
 
@@ -51,6 +54,12 @@ const SbbmRegisterInfo *SbbmSubtarget::getRegisterInfo() const {
   static const SbbmRegisterInfo RegisterInfo;
 
   return &RegisterInfo;
+}
+
+const TargetSelectionDAGInfo *SbbmSubtarget::getSelectionDAGInfo() const {
+  static const TargetSelectionDAGInfo TSI(&DL);
+
+  return &TSI;
 }
 
 void SbbmSubtarget::anchor() {}

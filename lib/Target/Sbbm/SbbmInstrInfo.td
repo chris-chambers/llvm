@@ -305,3 +305,14 @@ def ADJCALLSTACKUP : SbbmInstr<
     "; ADJCALLSTACKUP $amt1 $amt2",
     [(callseq_end timm:$amt1, timm:$amt2)]>;
 }
+
+def ATOMIC_CMP_SWAP : SbbmInstr<
+    (outs GRRegs:$dst),
+    (ins i32imm:$ptr, GRRegs:$old, GRRegs:$new),
+    "; FIXME: ATOMIC_CMP_SWAP",
+    [(set GRRegs:$dst, (atomic_cmp_swap_32 iPTR:$ptr, GRRegs:$old, GRRegs:$new))]>;
+
+def ATOMIC_FENCE : SbbmInstr<
+    (outs), (ins),
+    "; FIXME: ATOMIC_FENCE",
+    [(atomic_fence (imm), (imm))]>;

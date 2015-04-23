@@ -6,6 +6,7 @@
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "llvm/Support/TargetRegistry.h"
+#include "llvm/Transforms/Scalar.h"
 
 using namespace llvm;
 
@@ -36,6 +37,10 @@ TargetPassConfig *SbbmTargetMachine::createPassConfig(PassManagerBase &PM) {
       : TargetPassConfig(TM, PM)
     { }
 
+    virtual void addIRPasses() override {
+      addPass(createTailCallEliminationPass());
+      addPass(createAtomicExpandPass(this->TM));
+    }
     virtual bool addPreISel() override { return false; }
     virtual bool addInstSelector() override {
       addPass(createSbbmISelDag(getTM<SbbmTargetMachine>(), getOptLevel()));

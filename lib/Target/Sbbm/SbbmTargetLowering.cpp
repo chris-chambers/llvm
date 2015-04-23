@@ -37,6 +37,9 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
       ISD::SRL_PARTS,
       ISD::SRA_PARTS,
 
+      ISD::ROTL,
+      ISD::ROTR,
+
       ISD::SMUL_LOHI,
       ISD::UMUL_LOHI,
 
@@ -93,7 +96,10 @@ SDValue SbbmTargetLowering::LowerCall(
   }
 
   if (isTailCall) {
-    llvm_unreachable("tail calls are not implemented");
+    if (CLI.CS->isMustTailCall()) {
+      report_fatal_error("failed to perform tail call elimination on a call marked musttail");
+    }
+    isTailCall = false;
   }
 
   // Analyze operands of the call, assigning locations to each operand.
@@ -143,8 +149,12 @@ SDValue SbbmTargetLowering::LowerCall(
     Ops.push_back(DAG.getTargetGlobalAddress(G->getGlobal(), dl, MVT::i32));
   } else if (ExternalSymbolSDNode *ES = dyn_cast<ExternalSymbolSDNode>(Callee)) {
     Ops.push_back(SDValue(ES, 0));
+  } else if (LoadSDNode *L = dyn_cast<LoadSDNode>(Callee)) {
+    Ops.push_back(L->getBasePtr());
   } else {
-    llvm_unreachable("unsupported call type");
+    // FIXME: This is probably not going to work.  LowerCall needs an overhaul.
+    Ops.push_back(Callee);
+    //llvm_unreachable("unsupported call type");
   }
 
   // Add argument registers to the end of the list so that they are known live
