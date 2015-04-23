@@ -103,6 +103,29 @@ bool SbbmInstrInfo::expandPostRAPseudo(MachineBasicBlock::iterator MI) const {
   return false;
 }
 
+namespace {
+
+void ExtractCond(const MachineInstr &MI, SmallVectorImpl<MachineOperand> &Cond) {
+  // TODO: ExtractCond could be made to work on any predicated isntruction,
+  //       assuming that predicate registers are always in the variable_ops
+  //       position.
+  if (MI.getOpcode() != Sbbm::B_P) {
+    llvm_unreachable("ExtractCond currently only works on B_P");
+  }
+
+  if (MI.getNumOperands() < 2) {
+    return;
+  }
+
+  std::vector<MachineOperand> PredRegs(MI.operands_begin() + 1, MI.operands_end());
+  for (auto& PredReg : PredRegs) {
+    PredReg.clearParent();
+  }
+  std::move(PredRegs.begin(), PredRegs.end(), std::back_inserter(Cond));
+}
+
+} // anonymous namespace
+
 bool SbbmInstrInfo::AnalyzeBranch(
   MachineBasicBlock &MBB, MachineBasicBlock *&TBB, MachineBasicBlock *&FBB,
   SmallVectorImpl<MachineOperand> &Cond, bool AllowModify = false)
@@ -133,21 +156,17 @@ bool SbbmInstrInfo::AnalyzeBranch(
       // If branch is unconditional set the true block to its operand.
       TBB = Terms[0]->getOperand(0).getMBB();
       return false;
+    case Sbbm::B_P:
+      TBB = Terms[0]->getOperand(0).getMBB();
+      ExtractCond(*Terms[0], Cond);
+      return false;
     case Sbbm::B_LR:
       return true;
-    case Sbbm::BCOND:
-      TBB = Terms[0]->getOperand(1).getMBB();
-      auto PredReg = Terms[0]->getOperand(0);
-      PredReg.clearParent();
-      Cond.push_back(PredReg);
-      return false;
     }
   case 2:
-    if (Terms[0]->getOpcode() == Sbbm::BCOND && Terms[1]->getOpcode() == Sbbm::B) {
-      TBB = Terms[0]->getOperand(1).getMBB();
-      auto PredReg = Terms[0]->getOperand(0);
-      PredReg.clearParent();
-      Cond.push_back(PredReg);
+    if (Terms[0]->getOpcode() == Sbbm::B_P && Terms[1]->getOpcode() == Sbbm::B) {
+      TBB = Terms[0]->getOperand(0).getMBB();
+      ExtractCond(*Terms[0], Cond);
       FBB = Terms[1]->getOperand(0).getMBB();
       return false;
     }
@@ -181,19 +200,17 @@ unsigned SbbmInstrInfo::InsertBranch(
       // Unconditional branch
       BuildMI(&MBB, DL, get(Sbbm::B)).addMBB(TBB);
     } else {
-      //instantiateCondBranch(MBB, DL, TBB, Cond);
-      BuildMI(&MBB, DL, get(Sbbm::BCOND))
-        .addOperand(Cond[0])
-        .addMBB(TBB);
+      BuildMI(&MBB, DL, get(Sbbm::B_P))
+        .addMBB(TBB)
+        .addOperand(Cond[0]);
     }
     return 1;
   }
 
   // Two-way conditional branch.
-  //instantiateCondBranch(MBB, DL, TBB, Cond);
-  BuildMI(&MBB, DL, get(Sbbm::BCOND))
-    .addOperand(Cond[0])
-    .addMBB(TBB);
+  BuildMI(&MBB, DL, get(Sbbm::B_P))
+    .addMBB(TBB)
+    .addOperand(Cond[0]);
   BuildMI(&MBB, DL, get(Sbbm::B)).addMBB(FBB);
   return 2;
 }

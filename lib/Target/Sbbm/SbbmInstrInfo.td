@@ -182,14 +182,6 @@ defm URNG : SbbmPredInstr<
 
 let isTerminator = 1, isBranch = 1 in {
 
-def BCOND : SbbmInstr<
-    (outs),
-    (ins AllPredRegs:$cond, brtarget:$dst),
-    "; BCOND needs to be eliminated">
-{
-    let isPseudo = 1;
-}
-
 def B_IND : SbbmInstr<
     (outs),
     (ins GRRegs:$dst),
@@ -199,15 +191,24 @@ def B_IND : SbbmInstr<
     let isPseudo = 1;
 }
 
-let isBarrier = 1 in {
-defm B : SbbmPredInstr<
-    "B",
+let BaseOpcode = "B" in {
+
+def B : SbbmUnpredInstrBase<
     (outs), (ins brtarget:$target),
     "b $target",
-    [(br bb:$target)]>;
+    [(br bb:$target)]>
+{
+    let isBarrier = 1;
 }
 
-}
+def B_P : SbbmPredInstrBase<
+    (outs), (ins brtarget:$target, variable_ops),
+    "b $target",
+    [/* no pattern */]>;
+
+} // BaseOpcode = "B"
+
+} // isTerminator = 1, isBranch = 1
 
 def SEL : SbbmInstr<
     (outs GRRegs:$dst),
@@ -266,7 +267,7 @@ def : Pat<(i32 (setuge GRRegs:$lhs, GRRegs:$rhs)),
           (i32 (URNG (SUBrr $lhs, $rhs), 0, 2147483647))>;
 
 def : Pat<(brcond AllPredRegs:$cond, bb:$dst),
-          (BCOND $cond, $dst)>;
+          (B_P $dst, $cond)>;
 
 def : Pat<(select AllPredRegs:$cond, GRRegs:$T, GRRegs:$F),
           (SEL $cond, $T, $F)>;
