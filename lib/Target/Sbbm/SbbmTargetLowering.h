@@ -29,6 +29,10 @@ public:
 
   virtual const char *getTargetNodeName(unsigned Opcode) const override;
 
+  virtual std::pair<unsigned, const TargetRegisterClass *>
+  getRegForInlineAsmConstraint(const std::string &Constraint, MVT VT)
+    const override;
+
   virtual bool shouldExpandAtomicStoreInIR(StoreInst *SI) const override {
     return true;
   }

@@ -3,6 +3,7 @@
 #define DEBUG_TYPE "sbbm-asm-printer"
 
 #include "SbbmSubtarget.h"
+#include "InstPrinter/SbbmInstPrinter.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/CodeGen/AsmPrinter.h"
 #include "llvm/MC/MCExpr.h"
@@ -37,6 +38,22 @@ public:
   virtual void EmitInstruction(const MachineInstr *MI) override {
     MCInst Lowered = LowerInstruction(*this, *MI);
     EmitToStreamer(OutStreamer, Lowered);
+  }
+
+  virtual bool PrintAsmOperand(
+    const MachineInstr *MI, unsigned OpNo, unsigned AsmVariant,
+    const char *ExtraCode, raw_ostream &OS) override
+  {
+    bool Error = AsmPrinter::PrintAsmOperand(MI, OpNo, AsmVariant, ExtraCode, OS);
+    if (Error) {
+      const MachineOperand &Op = MI->getOperand(OpNo);
+      if (Op.getType() == MachineOperand::MO_Register) {
+        OS << SbbmInstPrinter::getRegisterName(Op.getReg());
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 };
 

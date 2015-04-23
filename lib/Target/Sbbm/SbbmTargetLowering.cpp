@@ -74,6 +74,21 @@ const char *SbbmTargetLowering::getTargetNodeName(unsigned Opcode) const {
   }
 }
 
+std::pair<unsigned, const TargetRegisterClass *>
+SbbmTargetLowering::getRegForInlineAsmConstraint(
+  const std::string &Constraint, MVT VT) const
+{
+  if (Constraint.size() == 1) {
+    switch (Constraint[0]) {
+    case 'r':
+      if (VT == MVT::i32) {
+        return std::make_pair(0U, &Sbbm::GRRegsRegClass);
+      }
+    }
+  }
+  return TargetLowering::getRegForInlineAsmConstraint(Constraint, VT);
+}
+
 SDValue SbbmTargetLowering::LowerCall(
   TargetLowering::CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals) const
 {
