@@ -26,6 +26,10 @@ SbbmTargetLowering::SbbmTargetLowering(const SbbmTargetMachine &SbbmTM)
 
   setSchedulingPreference(Sched::RegPressure);
 
+  // Shifting is more expensive than dividing.
+  setIntDivIsCheap(true);
+  setPow2SDivIsCheap(true);
+
   for (auto VT : MVT::integer_valuetypes()) {
     setOperationAction(ISD::GlobalAddress, VT, Custom);
 
