@@ -45,10 +45,10 @@ void SbbmInstPrinter::printPredicate(const MCInst *MI, raw_ostream &O) {
       O << "{";
       if (PredSense == true) {
         printRegName(O, Reg);
-        O << ", 1, 1";
+        O << ", #1, #1";
       } else {
         printRegName(O, SbbmInstrInfo::ReversePredReg(Reg));
-        O << ", 0, 0";
+        O << ", #0, #0";
       }
       O << "}";
     }
@@ -76,7 +76,7 @@ void SbbmInstPrinter::printOperand(
   if (Op.isExpr()) {
     const MCExpr *Expr = Op.getExpr();
     if (auto SRE = dyn_cast<MCSymbolRefExpr>(Expr)) {
-      O << SRE->getSymbol();
+      O << '=' << SRE->getSymbol();
       return;
     }
 
