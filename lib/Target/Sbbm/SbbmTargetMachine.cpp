@@ -4,7 +4,9 @@
 #include "SbbmPasses.h"
 #include "TargetInfo/SbbmTargetInfo.h"
 #include "llvm/CodeGen/Passes.h"
+#include "llvm/PassManager.h"
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
+#include "llvm/Pass.h"
 #include "llvm/Support/TargetRegistry.h"
 #include "llvm/Transforms/Scalar.h"
 
@@ -30,13 +32,26 @@ const TargetSubtargetInfo *SbbmTargetMachine::getSubtargetImpl() const {
   return &Subtarget;
 }
 
+void SbbmTargetMachine::addAnalysisPasses(PassManagerBase &PM) {
+  LLVMTargetMachine::addAnalysisPasses(PM);
+  PM.add(Pass::createPass(&SbbmDefExpanderID));
+}
+
+bool SbbmTargetMachine::addPassesToEmitFile(
+  PassManagerBase &PM, formatted_raw_ostream &Out, CodeGenFileType FileType,
+  bool DisableVerify, AnalysisID StartAfter, AnalysisID StopAfter)
+{
+  PM.add(Pass::createPass(&SbbmDefRemoverID));
+  return LLVMTargetMachine::addPassesToEmitFile(
+    PM, Out, FileType, DisableVerify, StartAfter, StopAfter);
+}
+
 TargetPassConfig *SbbmTargetMachine::createPassConfig(PassManagerBase &PM) {
   class SbbmPassConfig : public TargetPassConfig {
   public:
     SbbmPassConfig(SbbmTargetMachine *TM, PassManagerBase &PM)
       : TargetPassConfig(TM, PM)
     { }
-
     virtual void addIRPasses() override {
       addPass(createTailCallEliminationPass());
       addPass(createAtomicExpandPass(this->TM));

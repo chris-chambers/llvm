@@ -8,7 +8,7 @@ SbbmMCAsmInfo::SbbmMCAsmInfo(StringRef TT) {
   SupportsDebugInformation = false;
   HasDotTypeDotSizeDirective = false;
   CommentString = ";";
-  SeparatorString = nullptr;
+  SeparatorString = "|";
 
   HiddenVisibilityAttr = MCSA_Invalid;
   HiddenDeclarationVisibilityAttr = MCSA_Invalid;

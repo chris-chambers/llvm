@@ -20,6 +20,13 @@ public:
 
   virtual const TargetSubtargetInfo *getSubtargetImpl() const override;
 
+  virtual void addAnalysisPasses(PassManagerBase &PM) override;
+
+  virtual bool addPassesToEmitFile(
+    PassManagerBase &PM, formatted_raw_ostream &Out, CodeGenFileType FileType,
+    bool DisableVerify = true, AnalysisID StartAfter = nullptr,
+    AnalysisID StopAfter = nullptr) override;
+
   virtual TargetPassConfig *createPassConfig(PassManagerBase &PM) override;
 
 private:

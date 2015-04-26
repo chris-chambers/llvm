@@ -12,4 +12,7 @@ class SbbmTargetMachine;
 FunctionPass *createSbbmISelDag(
   SbbmTargetMachine &TM, CodeGenOpt::Level OptLevel);
 
+extern char &SbbmDefExpanderID;
+extern char &SbbmDefRemoverID;
+
 } // namespace llvm

@@ -7,8 +7,8 @@ TARGET = Sbbm
 # Make sure that tblgen is run.
 BUILT_SOURCES = \
 	SbbmGenAsmWriter.inc \
-	SbbmGenDAGISel.inc \
 	SbbmGenCallingConv.inc \
+	SbbmGenDAGISel.inc \
 	SbbmGenInstrInfo.inc \
 	SbbmGenRegisterInfo.inc \
 	SbbmGenSubtargetInfo.inc

@@ -1,3 +1,4 @@
+; -*- mode: Conf -*-
 ; FIXME: Add standard header.
 
 [common]
@@ -7,14 +8,13 @@ subdirectories = InstPrinter MCTargetDesc TargetInfo
 type = TargetGroup
 name = Sbbm
 parent = Target
+;has_asmparser = 1
 
 [component_1]
 type = Library
 name = SbbmCodeGen
 parent = Sbbm
 required_libraries =
-    AsmPrinter CodeGen Core SelectionDAG Target
+    AsmPrinter CodeGen Core IPO SelectionDAG Target
     SbbmInfo SbbmInstPrinter
 add_to_library_groups = Sbbm
-
-; -*- Conf -*-

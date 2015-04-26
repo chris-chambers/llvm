@@ -1,0 +1,6 @@
+* Optimizations
+** Convert shl reg, imm => mul reg, 2^imm
+** Convert ashr reg, imm => sdiv reg, 2^imm
+** SbbmInstrInfo
+*** AnalyzeBranch, InsertBranch, RemoveBranch
+*** canInsertSelect, insertSelect, analyzeSelect, optimizeSelect
