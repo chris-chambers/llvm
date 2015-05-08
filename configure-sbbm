@@ -1,0 +1,24 @@
+#!/bin/sh
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+DISTPATH="$SCRIPTPATH/dist"
+
+export CXX=g++
+export CC=gcc
+export CFLAGS=""
+export CXXFLAGS=""
+export LDFLAGS=""
+
+"$SCRIPTPATH/configure" \
+    --prefix="$DISTPATH" \
+    --program-prefix= \
+    --enable-targets=x86,x86_64,sbbm \
+    --enable-optimized \
+    --enable-assertions \
+    --disable-docs \
+    --enable-bindings=none \
+    --with-python=/usr/bin/python2.7
+
+#    --enable-debug-symbols \
+#    --enable-optimized \
