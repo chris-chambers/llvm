@@ -15,8 +15,8 @@ using namespace llvm;
 void SbbmInstPrinter::printInst(
   const MCInst *MI, raw_ostream &O, StringRef Annot)
 {
-  printInstruction(MI, O);
   printPredicate(MI, O);
+  printInstruction(MI, O);
   printAnnotation(O, Annot);
 }
 

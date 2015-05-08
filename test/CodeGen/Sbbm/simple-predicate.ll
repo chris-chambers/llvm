@@ -5,8 +5,8 @@ define i32 @test1(i32 %a) {
 entry1:
 ; CHECK-LABEL: test1:
 ; CHECK: rng p0, r0, #10, #10
-; CHECK-NEXT: mov r0, #2 {p0, #0, #0}
-; CHECK-NEXT: mov r0, #1 {p0, #1, #1}
+; CHECK-NEXT: {p0, #0, #0} mov r0, #2
+; CHECK-NEXT: {p0, #1, #1} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp eq i32 %a, 10
   br i1 %0, label %t, label %f
@@ -21,8 +21,8 @@ define i32 @test2(i32 %a) {
 entry2:
 ; CHECK-LABEL: test2:
 ; CHECK: rng p0, r0, #10, #10
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp ne i32 %a, 10
   br i1 %0, label %t, label %f
@@ -37,8 +37,8 @@ define i32 @test3(i32 %a) {
 entry3:
 ; CHECK-LABEL: test3:
 ; CHECK: rng p0, r0, #-2147483648, #9
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sge i32 %a, 10
   br i1 %0, label %t, label %f
@@ -53,8 +53,8 @@ define i32 @test4(i32 %a) {
 entry4:
 ; CHECK-LABEL: test4:
 ; CHECK: rng p0, r0, #-2147483648, #10
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sgt i32 %a, 10
   br i1 %0, label %t, label %f
@@ -69,8 +69,8 @@ define i32 @test5(i32 %a) {
 entry5:
 ; CHECK-LABEL: test5:
 ; CHECK: rng p0, r0, #11, #2147483647
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sle i32 %a, 10
   br i1 %0, label %t, label %f
@@ -85,8 +85,8 @@ define i32 @test6(i32 %a) {
 entry6:
 ; CHECK-LABEL: test6:
 ; CHECK: rng p0, r0, #10, #2147483647
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp slt i32 %a, 10
   br i1 %0, label %t, label %f
@@ -102,8 +102,8 @@ entry7:
 ; CHECK-LABEL: test7:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #0, #0
-; CHECK-NEXT: mov r0, #2 {p0, #0, #0}
-; CHECK-NEXT: mov r0, #1 {p0, #1, #1}
+; CHECK-NEXT: {p0, #0, #0} mov r0, #2
+; CHECK-NEXT: {p0, #1, #1} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp eq i32 %a, %b
   br i1 %0, label %t, label %f
@@ -119,8 +119,8 @@ entry8:
 ; CHECK-LABEL: test8:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #0, #0
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp ne i32 %a, %b
   br i1 %0, label %t, label %f
@@ -136,8 +136,8 @@ entry9:
 ; CHECK-LABEL: test9:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #-2147483648, #-1
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sge i32 %a, %b
   br i1 %0, label %t, label %f
@@ -153,8 +153,8 @@ entry10:
 ; CHECK-LABEL: test10:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #-2147483648, #0
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sgt i32 %a, %b
   br i1 %0, label %t, label %f
@@ -170,8 +170,8 @@ entry11:
 ; CHECK-LABEL: test11:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #1, #2147483647
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp sle i32 %a, %b
   br i1 %0, label %t, label %f
@@ -187,8 +187,8 @@ entry12:
 ; CHECK-LABEL: test12:
 ; CHECK: sub r0, r1
 ; CHECK-NEXT: rng p0, r0, #0, #2147483647
-; CHECK-NEXT: mov r0, #2 {p0, #1, #1}
-; CHECK-NEXT: mov r0, #1 {p0, #0, #0}
+; CHECK-NEXT: {p0, #1, #1} mov r0, #2
+; CHECK-NEXT: {p0, #0, #0} mov r0, #1
 ; CHECK-NEXT: b lr
   %0 = icmp slt i32 %a, %b
   br i1 %0, label %t, label %f
