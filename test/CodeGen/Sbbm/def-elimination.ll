@@ -55,7 +55,7 @@ entry4:
 }
 
 define void @test5() {
-entry3:
+entry5:
 ; CHECK-LABEL: test5:
 ; CHECK: ;APP
 ; CHECK-NEXT: raw 1 2
@@ -66,5 +66,73 @@ entry3:
 	call void asm sideeffect "def foo, 2", ""()
 	call void asm sideeffect "def baz, %foo", ""()
 	call void asm sideeffect "raw %bar %baz", ""()
+    ret void
+}
+
+define void @test6() {
+entry6:
+; CHECK-LABEL: test6:
+; CHECK: ;APP
+; CHECK-NEXT: raw 1 2
+; CHECK-NEXT: ;NO_APP
+    call void @alfa1()
+    call void @bravo1()
+    call void @alfa2()
+    call void @bravo2()
+    call void asm sideeffect "raw %bravo1 %bravo2", ""()
+
+; CHECK: ;APP
+; CHECK-NEXT: raw 3 4
+; CHECK-NEXT: ;NO_APP
+; CHECK-NEXT: b lr
+    call void @alfa3()
+    call void @bravo1()
+    call void @alfa4()
+    call void @bravo2()
+    call void asm sideeffect "raw %bravo1 %bravo2", ""()
+    ret void
+}
+
+define void @alfa1() alwaysinline {
+	call void asm sideeffect "def foo, 1", ""()
+    ret void
+}
+
+define void @alfa2() alwaysinline {
+	call void asm sideeffect "def foo, 2", ""()
+    ret void
+}
+
+define void @alfa3() alwaysinline {
+	call void asm sideeffect "def foo, 3", ""()
+    ret void
+}
+
+define void @alfa4() alwaysinline {
+	call void asm sideeffect "def foo, 4", ""()
+    ret void
+}
+
+define void @bravo1() alwaysinline {
+	call void asm sideeffect "def bravo1, %foo", ""()
+    ret void
+}
+
+define void @bravo2() alwaysinline {
+	call void asm sideeffect "def bravo2, %foo", ""()
+    ret void
+}
+
+; Check that substitution does not eat backslashes.
+define void @test7() {
+entry7:
+; CHECK-LABEL: test7:
+; CHECK: ;APP
+; CHECK-NEXT: raw \u9000
+; CHECK-NEXT: ;NO_APP
+    call void asm sideeffect "def foo, \5cu9000", ""()
+    call void asm sideeffect "def bar, %foo", ""()
+    call void asm sideeffect "def baz, %bar", ""()
+    call void asm sideeffect "raw %baz", ""()
     ret void
 }

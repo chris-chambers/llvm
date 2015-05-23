@@ -19,24 +19,26 @@ namespace {
 
 class DefExpander : public FunctionPass {
 public:
-  DefExpander() : FunctionPass(ID) { }
+  DefExpander()
+    : FunctionPass(ID)
+    , DefRe("def[ \t]+([^,]+),[ \t]*(.*)")
+  { }
+
   static char ID;
+  // FIXME: Should use SbbmAsmParser.  It will be more reliable than a regex.
+  Regex DefRe;
 
   virtual bool runOnFunction(Function &F) {
     bool MadeChange = false;
     for (auto& BB : F) {
       StringMap<std::string> Defs;
-      MadeChange |= ProcessBB(BB, Defs);
+      MadeChange |= ProcessBB(BB, Defs, true);
     }
     return MadeChange;
   }
 
-  bool ProcessBB(BasicBlock &BB, StringMap<std::string> &Defs)
+  bool ProcessBB(BasicBlock &BB, StringMap<std::string> &Defs, bool AllowModify)
   {
-    // FIXME: Initialize this regular expression as a field, at construction time.
-    // FIXME: Should use SbbmAsmParser.  It will be more reliable than a regex.
-    Regex DefRe("def[ \t]+([^,]+),[ \t]*(.*)");
-
     bool MadeChange = false;
 
     for (auto &Inst : BB) {
@@ -49,7 +51,7 @@ public:
         if (F->hasFnAttribute(Attribute::AlwaysInline)) {
           if (F->size() == 1) {
             // FIXME: Guard against cycles!
-            ProcessBB(*F->begin(), Defs);
+            ProcessBB(*F->begin(), Defs, false);
           }
         }
         continue;
@@ -59,54 +61,66 @@ public:
         continue;
       }
 
-      InlineAsm* IA = cast<InlineAsm>(CI->getCalledValue());
-      const std::string& AsmStr = IA->getAsmString();
-
-      if (AsmStr.compare(0, 3, "def") == 0) {
-        SmallVector<StringRef, 3> Matches;
-        if (!DefRe.match(AsmStr, &Matches)) {
-          // FIXME: Do better.
-          report_fatal_error("incorrect def!");
-        }
-
-        Defs.insert(std::make_pair(Matches[1], Matches[2]));
-      } else {
-        // Expand def references, mark defs as consumed.
-        std::string Expanded(AsmStr);
-        StringMap<bool> UsedDefs;
-
-        // TODO: Move this to its own function.
-        for (const auto& Entry : Defs) {
-          std::string Pattern = "%" + std::string(Entry.first());
-          Regex Re(Pattern);
-          std::string S = Re.sub(Entry.second, Expanded);
-          if (S.compare(Expanded) != 0) {
-            DEBUG(dbgs() << "Expand: " << Expanded << " => " << S << "\n");
-
-            UsedDefs.insert(std::make_pair(Entry.first(), true));
-            Expanded = S;
-          }
-        }
-
-        if (!UsedDefs.empty()) {
-          for (const auto& Entry : UsedDefs) {
-            Defs.erase(Entry.first());
-          }
-
-          DEBUG(dbgs()
-            << "Removed " << UsedDefs.size() << " consumed def(s). "
-            << "Remaining: " << Defs.size() << "\n\n");
-
-          InlineAsm* NewIA = InlineAsm::get(
-            IA->getFunctionType(), Expanded, IA->getConstraintString(),
-            IA->hasSideEffects(), IA->isAlignStack(), IA->getDialect());
-
-          CI->setCalledFunction(NewIA);
-          MadeChange = true;
-        }
-      }
+      MadeChange |= ExpandDefs(*CI, Defs, AllowModify);
     }
     return MadeChange;
+  }
+
+  bool ExpandDefs(CallInst &CI, StringMap<std::string> &Defs, bool AllowModify) {
+    InlineAsm* IA = cast<InlineAsm>(CI.getCalledValue());
+    const std::string& AsmStr = IA->getAsmString();
+
+    // Expand def references, mark defs as consumed.
+    std::string Expanded(AsmStr);
+    StringMap<bool> UsedDefs;
+
+    for (const auto& Entry : Defs) {
+      std::string Pattern = "%" + std::string(Entry.first());
+      Regex Re(Pattern);
+      std::string S = Re.sub(Regex::escape(Entry.second), Expanded);
+      if (S.compare(Expanded) != 0) {
+        DEBUG(dbgs() << "Expand: " << Expanded << " => " << S << "\n");
+
+        UsedDefs.insert(std::make_pair(Entry.first(), true));
+        Expanded = S;
+      }
+    }
+
+    const bool HadUsedDefs = !UsedDefs.empty();
+    for (const auto& Entry : UsedDefs) {
+      Defs.erase(Entry.first());
+    }
+
+    ExtractDef(Expanded, Defs);
+
+    if (!AllowModify || !HadUsedDefs) {
+      return false;
+    }
+
+    DEBUG(dbgs()
+      << "Removed " << UsedDefs.size() << " consumed def(s). "
+      << "Remaining: " << Defs.size() << "\n\n");
+
+    InlineAsm* NewIA = InlineAsm::get(
+      IA->getFunctionType(), Expanded, IA->getConstraintString(),
+      IA->hasSideEffects(), IA->isAlignStack(), IA->getDialect());
+
+    CI.setCalledFunction(NewIA);
+    return true;
+  }
+
+  void ExtractDef(const std::string &AsmStr, StringMap<std::string> &Defs) {
+    if (AsmStr.compare(0, 3, "def") == 0) {
+      SmallVector<StringRef, 3> Matches;
+      if (!DefRe.match(AsmStr, &Matches)) {
+        // FIXME: Do better.
+        report_fatal_error("incorrect def!");
+      }
+
+      DEBUG(dbgs() << "Extract: " << Matches[1] << " = " << Matches[2] << "\n");
+
+      Defs[Matches[1]] = Matches[2];
+    }
   }
 };
 
