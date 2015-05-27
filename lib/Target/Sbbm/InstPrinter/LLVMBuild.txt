@@ -1,4 +1,6 @@
-; FIXME: Add standard header.
+; -*- Conf -*-
+; Copyright 2015, Christopher Chambers
+; Distributed under the GNU GPL v3. See LICENSE.TXT for details.
 
 [component_0]
 type = Library
@@ -6,5 +8,3 @@ name = SbbmInstPrinter
 parent = Sbbm
 required_libraries = MC Support SbbmInfo
 add_to_library_groups = Sbbm
-
-; -*- Conf -*-

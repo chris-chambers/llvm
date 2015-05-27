@@ -1,4 +1,5 @@
-// FIXME: Add standard header.
+// Copyright 2015, Christopher Chambers
+// Distributed under the GNU GPL v3. See LICENSE.TXT for details.
 
 // Instruction format superclass
 class SbbmInstr<dag outs, dag ins, string asmstr, list<dag> pattern = []>

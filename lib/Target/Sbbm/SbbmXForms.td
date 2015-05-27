@@ -1,3 +1,6 @@
+// Copyright 2015, Christopher Chambers
+// Distributed under the GNU GPL v3. See LICENSE.TXT for details.
+
 def negate : SDNodeXForm<imm, [{
     uint32_t value = N->getZExtValue();
     return CurDAG->getTargetConstant(-value, MVT::i32);

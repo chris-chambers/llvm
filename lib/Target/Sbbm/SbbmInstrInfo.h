@@ -1,4 +1,5 @@
-// FIXME: Add standard header.
+// Copyright 2015, Christopher Chambers
+// Distributed under the GNU GPL v3. See LICENSE.TXT for details.
 
 #ifndef SBBM_INSTRUCTIONINFO_H
 #define SBBM_INSTRUCTIONINFO_H

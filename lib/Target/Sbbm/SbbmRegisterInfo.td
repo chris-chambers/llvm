@@ -1,4 +1,5 @@
-// FIXME: Add standard header.
+// Copyright 2015, Christopher Chambers
+// Distributed under the GNU GPL v3. See LICENSE.TXT for details.
 
 class SbbmReg<bits<16> Enc, string n> : Register<n> {
     let HWEncoding = Enc;

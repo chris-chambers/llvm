@@ -1,3 +1,6 @@
+// Copyright 2015, Christopher Chambers
+// Distributed under the GNU GPL v3. See LICENSE.TXT for details.
+
 #include "SbbmPasses.h"
 #include "SbbmTargetMachine.h"
 #include "llvm/ADT/SmallVector.h"
