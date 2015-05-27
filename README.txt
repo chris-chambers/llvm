@@ -1,5 +1,11 @@
-Low Level Virtual Machine (LLVM)
-================================
+Low Level Virtual Machine (LLVM with SBBM)
+==========================================
+
+This fork of the LLVM project adds support for a new backend, SBBM.  The
+SBBM backend allows languages that target LLVM to be used to generate
+command block circuits in Minecraft.
+
+------------------------------------------
 
 This directory and its subdirectories contain source code for LLVM,
 a toolkit for the construction of highly optimized compilers,
@@ -15,4 +21,3 @@ documentation setup.
 
 If you're writing a package for LLVM, see docs/Packaging.rst for our
 suggestions.
-
