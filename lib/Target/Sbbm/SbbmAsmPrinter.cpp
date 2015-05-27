@@ -62,7 +62,10 @@ std::tuple<bool, MCOperand> LowerOperand(
 {
   switch (MO.getType()) {
   default:
-    llvm_unreachable("unknown operand type");
+    llvm_unreachable("LowerOperand: unknown operand type");
+  case MachineOperand::MO_RegisterMask:
+    // Ignore register masks.
+    return std::make_tuple(false, MCOperand());
   case MachineOperand::MO_Register:
     // Ignore all implicit register operands.
     if (MO.isImplicit()) {

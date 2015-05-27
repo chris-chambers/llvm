@@ -53,6 +53,25 @@ void SbbmInstrInfo::copyPhysReg(
     .addReg(SrcReg, getKillRegState(KillSrc));
 }
 
+void SbbmInstrInfo::storeRegToStackSlot(
+  MachineBasicBlock &MBB, MachineBasicBlock::iterator I, unsigned SrcReg,
+  bool isKill, int FrameIndex, const TargetRegisterClass *RC,
+  const TargetRegisterInfo *TRI) const
+{
+  BuildMI(MBB, I, I->getDebugLoc(), get(Sbbm::STR))
+    .addReg(SrcReg, getKillRegState(isKill))
+    .addFrameIndex(FrameIndex);
+}
+
+void SbbmInstrInfo::loadRegFromStackSlot(
+  MachineBasicBlock &MBB, MachineBasicBlock::iterator I, unsigned DestReg,
+  int FrameIndex, const TargetRegisterClass *RC,
+  const TargetRegisterInfo *TRI) const
+{
+  BuildMI(MBB, I, I->getDebugLoc(), get(Sbbm::LDR), DestReg)
+    .addFrameIndex(FrameIndex);
+}
+
 bool SbbmInstrInfo::expandPostRAPseudo(MachineBasicBlock::iterator MI) const {
   if (MI->getOpcode() == Sbbm::SEL) {
     DebugLoc DL = MI->getDebugLoc();

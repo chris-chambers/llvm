@@ -41,6 +41,16 @@ public:
     MachineBasicBlock &MBB, MachineBasicBlock::iterator I, DebugLoc DL,
     unsigned DestReg, unsigned SrcReg, bool KillSrc) const override;
 
+  virtual void storeRegToStackSlot(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator I, unsigned SrcReg,
+    bool isKill, int FrameIndex, const TargetRegisterClass *RC,
+    const TargetRegisterInfo *TRI) const override;
+
+  virtual void loadRegFromStackSlot(
+    MachineBasicBlock &MBB, MachineBasicBlock::iterator I, unsigned DestReg,
+    int FrameIndex, const TargetRegisterClass *RC,
+    const TargetRegisterInfo *TRI) const override;
+
   virtual bool isProfitableToIfCvt(
     MachineBasicBlock &MBB, unsigned NumCycles, unsigned ExtraPredCycles,
     const BranchProbability &Probability) const override
